@@ -1,0 +1,123 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-white text-noir-900 font-sans antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+    min-height: 100dvh;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-serif;
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer components {
+  .container-app {
+    @apply mx-auto w-full max-w-md px-5;
+  }
+
+  /* רקע לבן — app-bg הוסר */
+  /* זכוכית / כרטיסים — רקע לבן */
+  .glass {
+    @apply border border-neutral-200 bg-white shadow-sm;
+  }
+  .glass-strong {
+    @apply border border-neutral-200 bg-white shadow-md;
+  }
+  /* זכוכית בהירה-פרוסטד (כמו כרטיס ההזמנה הבהיר בתמונה) */
+  .glass-light {
+    @apply border border-white/20 bg-cream/[0.92] text-noir-900 shadow-float backdrop-blur-xl;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-cream px-6 py-4 text-base font-semibold text-noir-900 shadow-float transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl border border-neutral-300 bg-neutral-50 px-6 py-4 text-base font-semibold text-noir-900 transition-all duration-200 active:scale-[0.98] disabled:opacity-40;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-medium text-neutral-600 transition-colors duration-200 hover:text-noir-900 active:scale-[0.98];
+  }
+
+  .input-field {
+    @apply w-full rounded-2xl border border-neutral-200 bg-white px-4 py-3.5 text-base text-noir-900 outline-none transition-all duration-200 placeholder:text-neutral-400 focus:border-gold/50 focus:ring-4 focus:ring-gold/10;
+  }
+
+  .label-field {
+    @apply mb-1.5 block text-sm font-medium text-neutral-600;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1.5 text-xs font-medium text-neutral-600;
+  }
+  .chip-active {
+    @apply border-gold/40 bg-gold/10 text-gold-dark;
+  }
+
+  /* הירו עם קצה תחתון עגול — מעבר רך לתוכן שמתחת */
+  .hero-curve {
+    isolation: isolate;
+    border-bottom-left-radius: 50% 1.75rem;
+    border-bottom-right-radius: 50% 1.75rem;
+  }
+
+  .hero-scrim {
+    background:
+      linear-gradient(180deg, rgba(16, 13, 11, 0.45) 0%, transparent 38%),
+      linear-gradient(0deg, rgba(16, 13, 11, 0.78) 0%, rgba(16, 13, 11, 0.28) 42%, transparent 72%);
+  }
+
+  /* פאנל ניהול — רקע לבן (זהה לשאר האפליקציה) */
+  .admin-theme {
+    @apply bg-white text-noir-900;
+  }
+}
+
+/* פס גלילה עדין */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(201, 168, 106, 0.3);
+  border-radius: 8px;
+}
+
+.safe-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom), 1rem);
+}
+.safe-top {
+  padding-top: max(env(safe-area-inset-top), 0px);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

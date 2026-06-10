@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Service {
+  id           String        @id @default(cuid())
+  name         String
+  description  String?
+  durationMin  Int
+  price        Int
+  order        Int           @default(0)
+  active       Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  appointments Appointment[]
+}
+
+model Appointment {
+  id             String   @id @default(cuid())
+  serviceId      String
+  service        Service  @relation(fields: [serviceId], references: [id])
+  // snapshot של פרטי השירות בזמן ההזמנה
+  serviceName    String
+  durationMin    Int
+  price          Int
+  date           String // "YYYY-MM-DD"
+  startTime      String // "HH:MM"
+  customerName   String
+  phone          String
+  email          String
+  notes          String?
+  inspoIds       String? // csv של מזהי תמונות השראה שנבחרו
+  status         String   @default("pending") // pending | confirmed | cancelled
+  reminderSentAt DateTime?
+  createdAt      DateTime @default(now())
+
+  @@index([date])
+  @@index([status])
+}
+
+model WorkingHours {
+  id        String  @id @default(cuid())
+  dayOfWeek Int     @unique // 0 = ראשון ... 6 = שבת
+  isOpen    Boolean @default(true)
+  startTime String  @default("09:00")
+  endTime   String  @default("19:00")
+}
+
+model BlockedDate {
+  id     String  @id @default(cuid())
+  date   String  @unique // "YYYY-MM-DD"
+  reason String?
+}
+
+model Setting {
+  key   String @id
+  value String
+}
+
+model InspoImage {
+  id        String   @id @default(cuid())
+  src       String // נתיב/URL לתמונה
+  label     String?
+  tags      String   @default("") // csv: "nude,almond,autumn"
+  order     Int      @default(0)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@index([active])
+}
