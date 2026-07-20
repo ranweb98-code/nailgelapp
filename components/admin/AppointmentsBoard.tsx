@@ -24,7 +24,7 @@ interface Appointment {
   price: number;
   customerName: string;
   phone: string;
-  email: string;
+  email: string | null;
   notes: string | null;
   status: string;
   inspoSrcs: string[];
@@ -187,19 +187,21 @@ export function AppointmentsBoard({
                     <a
                       href={`tel:${a.phone.replace(/-/g, "")}`}
                       dir="ltr"
-                      className="flex items-center gap-1.5 text-neutral-600 transition-colors hover:text-gold"
+                      className="flex items-center gap-1.5 text-neutral-600 transition-colors hover:text-gold dark:text-neutral-300"
                     >
                       <Phone className="h-4 w-4 text-gold" />
                       {a.phone}
                     </a>
-                    <a
-                      href={`mailto:${a.email}`}
-                      dir="ltr"
-                      className="flex items-center gap-1.5 truncate text-neutral-600 transition-colors hover:text-gold"
-                    >
-                      <Mail className="h-4 w-4 text-gold" />
-                      {a.email}
-                    </a>
+                    {a.email && (
+                      <a
+                        href={`mailto:${a.email}`}
+                        dir="ltr"
+                        className="flex items-center gap-1.5 truncate text-neutral-600 transition-colors hover:text-gold dark:text-neutral-300"
+                      >
+                        <Mail className="h-4 w-4 text-gold" />
+                        {a.email}
+                      </a>
+                    )}
                   </div>
 
                   {a.notes && (

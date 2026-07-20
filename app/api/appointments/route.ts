@@ -7,6 +7,7 @@ import {
   sendOwnerNewAppointment,
   type AppointmentEmailData,
 } from "@/lib/email";
+import { notifyNewAppointment } from "@/lib/push";
 
 export const dynamic = "force-dynamic";
 
@@ -19,9 +20,16 @@ const bookingSchema = z.object({
     .string()
     .trim()
     .regex(/^0\d{1,2}-?\d{7}$/, "מספר טלפון לא תקין"),
-  email: z.string().trim().email("כתובת אימייל לא תקינה"),
+  email: z
+    .string()
+    .trim()
+    .email("כתובת אימייל לא תקינה")
+    .optional()
+    .or(z.literal("")),
   notes: z.string().trim().max(500).optional(),
   inspoIds: z.array(z.string()).max(20).optional(),
+  /** endpoint של מנוי Push במכשיר הנוכחי — לקישור מיידי לפני שליחת התראה */
+  pushEndpoint: z.string().url().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -76,6 +84,8 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  const email = data.email?.trim() ? data.email.trim().toLowerCase() : null;
+
   const appointment = await prisma.appointment.create({
     data: {
       serviceId: service.id,
@@ -86,17 +96,31 @@ export async function POST(req: NextRequest) {
       startTime: data.startTime,
       customerName: data.customerName,
       phone: data.phone,
-      email: data.email,
+      email,
       notes: data.notes,
       inspoIds: inspoIdsCsv,
       status: "pending",
     },
   });
 
+  // מקשרים את מנוי ה-Push של המכשיר לפרטי הלקוחה לפני שליחת ההתראה
+  if (data.pushEndpoint) {
+    await prisma.pushSubscription
+      .updateMany({
+        where: { endpoint: data.pushEndpoint },
+        data: {
+          phone: data.phone,
+          email,
+          role: "customer",
+        },
+      })
+      .catch(() => {});
+  }
+
   const emailData: AppointmentEmailData = {
     customerName: appointment.customerName,
     phone: appointment.phone,
-    email: appointment.email,
+    email: appointment.email || "",
     serviceName: appointment.serviceName,
     date: appointment.date,
     startTime: appointment.startTime,
@@ -105,10 +129,20 @@ export async function POST(req: NextRequest) {
     inspoImages,
   };
 
-  // שליחת אימיילים (לא חוסם את התגובה אם נכשל)
+  // אימיילים + Push למי שהתקין את האפליקציה
   await Promise.allSettled([
     sendOwnerNewAppointment(emailData),
-    sendCustomerConfirmation(emailData),
+    appointment.email
+      ? sendCustomerConfirmation(emailData)
+      : Promise.resolve(true),
+    notifyNewAppointment({
+      customerName: appointment.customerName,
+      phone: appointment.phone,
+      email: appointment.email || "",
+      serviceName: appointment.serviceName,
+      date: appointment.date,
+      startTime: appointment.startTime,
+    }),
   ]);
 
   return NextResponse.json(

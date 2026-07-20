@@ -143,6 +143,7 @@ export async function sendOwnerNewAppointment(
 export async function sendCustomerConfirmation(
   data: AppointmentEmailData
 ): Promise<boolean> {
+  if (!data.email?.trim()) return true;
   const body = `
     <p style="color:#2B2622; font-size:16px; margin-top:0;">היי ${data.customerName}, התור שלך נקלט בהצלחה!</p>
     ${detailsTable(data)}
@@ -161,6 +162,7 @@ export async function sendCustomerConfirmation(
 export async function sendCustomerReminder(
   data: AppointmentEmailData
 ): Promise<boolean> {
+  if (!data.email?.trim()) return true;
   const body = `
     <p style="color:#2B2622; font-size:16px; margin-top:0;">תזכורת קטנה 💖 יש לך תור מתקרב:</p>
     ${detailsTable(data)}

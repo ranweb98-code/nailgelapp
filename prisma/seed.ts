@@ -88,6 +88,7 @@ async function main() {
     { key: "phone", value: "050-0000000" },
     { key: "address", value: "רחוב הדוגמה 1, תל אביב" },
     { key: "slotStepMin", value: "30" },
+    { key: "bgTheme", value: "light" },
   ];
   for (const s of settings) {
     await prisma.setting.upsert({

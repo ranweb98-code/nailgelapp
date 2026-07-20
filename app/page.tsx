@@ -12,10 +12,13 @@ import { getSettings } from "@/lib/settings";
 import { HEBREW_DAYS } from "@/lib/time";
 import { ServiceCard } from "@/components/ServiceCard";
 import { InstallPrompt } from "@/components/InstallPrompt";
+import { runCleanup } from "@/lib/cleanup";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
+  await runCleanup().catch(() => {});
+
   const [services, settings, hours, inspo] = await Promise.all([
     prisma.service.findMany({
       where: { active: true },
@@ -31,7 +34,7 @@ export default async function HomePage() {
   ]);
 
   return (
-    <main className="min-h-dvh bg-white pb-28">
+    <main className="page-bg min-h-dvh pb-28">
       {/* Hero - תמונת ציפורניים + שם בסריף + קצה עגול */}
       <section className="hero-curve relative z-[1] h-[62vh] min-h-[420px] w-full overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}

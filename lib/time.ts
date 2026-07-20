@@ -1,5 +1,8 @@
 // פונקציות עזר טהורות לעבודה עם תאריכים ושעות (ניתנות לשימוש גם בצד הלקוח)
 
+/** אזור הזמן של העסק — כל "היום" ושעות פנויות לפי ישראל */
+export const APP_TIMEZONE = "Asia/Jerusalem";
+
 export const HEBREW_DAYS = [
   "ראשון",
   "שני",
@@ -42,12 +45,21 @@ export function parseDateString(dateStr: string): Date {
   return new Date(y, m - 1, d);
 }
 
-// Date -> "YYYY-MM-DD" (לפי זמן מקומי)
-export function toDateString(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
+// Date -> "YYYY-MM-DD" (לפי Asia/Jerusalem)
+export function toDateString(date: Date = new Date()): string {
+  return date.toLocaleDateString("en-CA", { timeZone: APP_TIMEZONE });
+}
+
+export function getNowMinutesInAppTimezone(now: Date = new Date()): number {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: APP_TIMEZONE,
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(now);
+  const hour = Number(parts.find((p) => p.type === "hour")?.value ?? 0);
+  const minute = Number(parts.find((p) => p.type === "minute")?.value ?? 0);
+  return hour * 60 + minute;
 }
 
 export function getDayOfWeek(dateStr: string): number {

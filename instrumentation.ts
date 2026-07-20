@@ -14,9 +14,16 @@ export async function register() {
   if (g.__gelCronTimer) return;
 
   const { runReminders } = await import("@/lib/reminders");
+  const { runCleanup } = await import("@/lib/cleanup");
 
   const tick = async () => {
     try {
+      const cleaned = await runCleanup();
+      if (cleaned.appointmentsDeleted > 0 || cleaned.blockedDatesDeleted > 0) {
+        console.log(
+          `[cleanup] נמחקו ${cleaned.appointmentsDeleted} תורים, ${cleaned.blockedDatesDeleted} ימים חסומים`
+        );
+      }
       const result = await runReminders();
       if (result.sent > 0) {
         console.log(

@@ -32,6 +32,7 @@ npm run dev        # http://localhost:3000
 | `RESEND_API_KEY` | מפתח Resend לשליחת אימיילים אמיתיים. ריק = מצב preview (האימיילים מודפסים ל-console) |
 | `OWNER_EMAIL` | כתובת בעלת העסק לקבלת התראות על תורים חדשים |
 | `EMAIL_FROM` | כתובת השולח (דורש דומיין מאומת ב-Resend) |
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` | מפתחות Web Push להתראות באפליקציה המותקנת |
 | `REMINDER_HOURS_BEFORE` | כמה שעות לפני התור לשלוח תזכורת (ברירת מחדל: 24) |
 
 ## מסכים
@@ -51,6 +52,21 @@ npm run dev        # http://localhost:3000
 3. ממלאים ב-`.env` את `RESEND_API_KEY`, `EMAIL_FROM`, ו-`OWNER_EMAIL`.
 
 ללא מפתח — האפליקציה עובדת במלואה והאימיילים מודפסים ל-console (נוח לדמו).
+
+## התראות Push (PWA)
+
+מי שמתקין את האפליקציה למסך הבית **חייב** לאפשר התראות. בלי זה מוצג מסך חסימה.
+
+1. יוצרים מפתחות: `npx web-push generate-vapid-keys --json`
+2. ממלאים ב-`.env`:
+   - `NEXT_PUBLIC_VAPID_PUBLIC_KEY`
+   - `VAPID_PRIVATE_KEY`
+   - `VAPID_SUBJECT` (למשל `mailto:owner@example.com`)
+3. אחרי התקנה + אישור הרשאות:
+   - **לקוחה** מקבלת Push על אישור תור, אישור/ביטול ותזכורת
+   - **בעלת העסק** (אחרי כניסה לפאנל באפליקציה) מקבלת Push על תור חדש
+
+הערה: ב-iPhone נדרש iOS 16.4+ והאתר חייב להיפתח מ"הוסף למסך הבית".
 
 ## תזכורות אוטומטיות
 

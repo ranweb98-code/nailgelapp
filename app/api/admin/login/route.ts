@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "גוף בקשה לא תקין" }, { status: 400 });
   }
 
-  if (!body.password || !verifyPassword(body.password)) {
+  if (!body.password || !(await verifyPassword(body.password))) {
     return NextResponse.json({ error: "סיסמה שגויה" }, { status: 401 });
   }
 

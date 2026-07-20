@@ -135,6 +135,22 @@ export function BookingFlow({
     setSubmitting(true);
     setError(null);
     try {
+      let pushEndpoint: string | undefined;
+      try {
+        pushEndpoint = localStorage.getItem("noir-push-endpoint") || undefined;
+      } catch {
+        /* ignore */
+      }
+      if (!pushEndpoint && "serviceWorker" in navigator) {
+        try {
+          const reg = await navigator.serviceWorker.ready;
+          const sub = await reg.pushManager.getSubscription();
+          pushEndpoint = sub?.endpoint;
+        } catch {
+          /* ignore */
+        }
+      }
+
       const res = await fetch("/api/appointments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -144,9 +160,10 @@ export function BookingFlow({
           startTime: time,
           customerName: form.customerName,
           phone: form.phone,
-          email: form.email,
+          email: form.email.trim() || undefined,
           notes: form.notes || undefined,
           inspoIds: selectedInspo.length ? selectedInspo : undefined,
+          pushEndpoint,
         }),
       });
       const json = await res.json();
@@ -170,7 +187,8 @@ export function BookingFlow({
   const validDetails =
     form.customerName.trim().length >= 2 &&
     /^0\d{1,2}-?\d{7}$/.test(form.phone.trim()) &&
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim());
+    (form.email.trim() === "" ||
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim()));
 
   if (success) {
     return <SuccessScreen data={success} onReset={() => router.push("/")} />;
@@ -182,7 +200,7 @@ export function BookingFlow({
   );
 
   return (
-    <div className="min-h-dvh bg-white pb-32">
+    <div className="page-bg min-h-dvh pb-32">
       {/* Header + Stepper */}
       <header className="sticky top-0 z-20 border-b border-neutral-200 bg-white/90 px-5 pb-3 pt-[max(env(safe-area-inset-top),1rem)] backdrop-blur-xl">
         <div className="container-app px-0">
@@ -437,7 +455,8 @@ export function BookingFlow({
 
               <div>
                 <label htmlFor="email" className="label-field">
-                  אימייל
+                  אימייל{" "}
+                  <span className="font-normal text-neutral-400">(אופציונלי)</span>
                 </label>
                 <input
                   id="email"
@@ -453,7 +472,7 @@ export function BookingFlow({
                   }
                 />
                 <p className="mt-1 text-xs text-neutral-400">
-                  לשם נשלח אישור התור ותזכורת לפני המועד
+                  אם תמלאו — נשלח אישור ותזכורת למייל
                 </p>
               </div>
 
@@ -591,8 +610,8 @@ function SuccessScreen({
       </div>
 
       <h1 className="animate-fade-up text-3xl text-noir-900">התור נקבע!</h1>
-      <p className="mt-2 animate-fade-up text-neutral-600 [animation-delay:80ms]">
-        שלחנו אישור למייל שלכם. נתראה בקרוב!
+      <p className="mt-2 animate-fade-up text-neutral-600 [animation-delay:80ms] dark:text-neutral-400">
+        התור נקלט בהצלחה. נתראה בקרוב!
       </p>
 
       <div className="glass mt-6 w-full max-w-sm animate-fade-up rounded-3xl p-5 text-right [animation-delay:160ms]">

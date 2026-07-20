@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -31,7 +31,7 @@ model Appointment {
   startTime      String // "HH:MM"
   customerName   String
   phone          String
-  email          String
+  email          String? // אופציונלי
   notes          String?
   inspoIds       String? // csv של מזהי תמונות השראה שנבחרו
   status         String   @default("pending") // pending | confirmed | cancelled
@@ -71,4 +71,22 @@ model InspoImage {
   createdAt DateTime @default(now())
 
   @@index([active])
+}
+
+// מנוי להתראות Push של מי שהתקין את ה-PWA
+model PushSubscription {
+  id        String   @id @default(cuid())
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  // customer = לקוחה | owner = בעלת העסק (מפאנל הניהול)
+  role      String   @default("customer")
+  phone     String?
+  email     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([role])
+  @@index([phone])
+  @@index([email])
 }

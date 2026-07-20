@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { isAuthenticated } from "@/lib/auth";
+import { notifyAppointmentStatus } from "@/lib/push";
 
 export const dynamic = "force-dynamic";
 
@@ -39,6 +40,20 @@ export async function PATCH(
     where: { id },
     data: { status: parsed.data.status },
   });
+
+  if (
+    parsed.data.status !== existing.status &&
+    (parsed.data.status === "confirmed" || parsed.data.status === "cancelled")
+  ) {
+    await notifyAppointmentStatus({
+      phone: updated.phone,
+      email: updated.email || "",
+      serviceName: updated.serviceName,
+      date: updated.date,
+      startTime: updated.startTime,
+      status: parsed.data.status,
+    }).catch(() => {});
+  }
 
   return NextResponse.json({ id: updated.id, status: updated.status });
 }

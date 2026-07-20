@@ -1,7 +1,7 @@
 // תוויות תגים לגלריית ההשראה (טהור - שמיש בצד לקוח ושרת)
 
 export const TAG_LABELS: Record<string, string> = {
-  nude: "נюד",
+  nude: "ניוד",
   almond: "שקדייה",
   french: "פרנץ'",
   autumn: "סתיו",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   Clock,
@@ -8,6 +8,7 @@ import {
   CalendarOff,
   Plus,
   Trash2,
+  Pencil,
   Check,
   Loader2,
   X,
@@ -88,6 +89,9 @@ function WorkingHoursSection({ initial }: { initial: HourRow[] }) {
   const [hours, setHours] = useState<HourRow[]>(initial);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  // מונע hydration mismatch של input[type=time] בדפדפנים עם AM/PM
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const update = (day: number, patch: Partial<HourRow>) => {
     setHours((prev) =>
@@ -119,14 +123,15 @@ function WorkingHoursSection({ initial }: { initial: HourRow[] }) {
         {hours.map((h) => (
           <li
             key={h.dayOfWeek}
-            className="flex items-center gap-2 rounded-2xl bg-neutral-50 p-2.5"
+            className="flex items-center gap-2 rounded-2xl bg-neutral-50 p-2.5 dark:bg-noir-700"
           >
             <button
               type="button"
+              dir="ltr"
               onClick={() => update(h.dayOfWeek, { isOpen: !h.isOpen })}
               className={[
                 "flex h-7 w-12 shrink-0 items-center rounded-full p-0.5 transition-colors",
-                h.isOpen ? "bg-gold" : "bg-neutral-200",
+                h.isOpen ? "bg-gold" : "bg-neutral-200 dark:bg-neutral-600",
               ].join(" ")}
               aria-pressed={h.isOpen}
               aria-label={`פתוח ביום ${HEBREW_DAYS[h.dayOfWeek]}`}
@@ -134,7 +139,7 @@ function WorkingHoursSection({ initial }: { initial: HourRow[] }) {
               <span
                 className={[
                   "h-6 w-6 rounded-full bg-white shadow transition-transform",
-                  h.isOpen ? "-translate-x-5" : "translate-x-0",
+                  h.isOpen ? "translate-x-5" : "translate-x-0",
                 ].join(" ")}
               />
             </button>
@@ -142,26 +147,32 @@ function WorkingHoursSection({ initial }: { initial: HourRow[] }) {
               {HEBREW_DAYS[h.dayOfWeek]}
             </span>
             {h.isOpen ? (
-              <div className="flex flex-1 items-center justify-end gap-1.5">
-                <input
-                  type="time"
-                  dir="ltr"
-                  value={h.startTime}
-                  onChange={(e) =>
-                    update(h.dayOfWeek, { startTime: e.target.value })
-                  }
-                  className="tabular rounded-xl border border-neutral-200 bg-neutral-50 px-2 py-1.5 text-sm text-noir-900 [color-scheme:light]"
-                />
-                <span className="text-neutral-400">-</span>
-                <input
-                  type="time"
-                  dir="ltr"
-                  value={h.endTime}
-                  onChange={(e) =>
-                    update(h.dayOfWeek, { endTime: e.target.value })
-                  }
-                  className="tabular rounded-xl border border-neutral-200 bg-neutral-50 px-2 py-1.5 text-sm text-noir-900 [color-scheme:light]"
-                />
+              <div className="flex flex-1 items-center justify-end gap-1.5" dir="ltr">
+                {mounted ? (
+                  <>
+                    <input
+                      type="time"
+                      value={h.startTime}
+                      onChange={(e) =>
+                        update(h.dayOfWeek, { startTime: e.target.value })
+                      }
+                      className="tabular rounded-xl border border-neutral-200 bg-white px-2 py-1.5 text-sm text-noir-900 [color-scheme:light] dark:border-neutral-600 dark:bg-noir-800 dark:text-cream dark:[color-scheme:dark]"
+                    />
+                    <span className="text-neutral-400">-</span>
+                    <input
+                      type="time"
+                      value={h.endTime}
+                      onChange={(e) =>
+                        update(h.dayOfWeek, { endTime: e.target.value })
+                      }
+                      className="tabular rounded-xl border border-neutral-200 bg-white px-2 py-1.5 text-sm text-noir-900 [color-scheme:light] dark:border-neutral-600 dark:bg-noir-800 dark:text-cream dark:[color-scheme:dark]"
+                    />
+                  </>
+                ) : (
+                  <span className="tabular text-sm text-noir-900">
+                    {h.startTime} - {h.endTime}
+                  </span>
+                )}
               </div>
             ) : (
               <span className="flex-1 text-left text-sm text-neutral-400">
@@ -186,19 +197,82 @@ function WorkingHoursSection({ initial }: { initial: HourRow[] }) {
   );
 }
 
+type ServiceForm = {
+  name: string;
+  description: string;
+  durationMin: string;
+  price: string;
+  active: boolean;
+};
+
+const emptyServiceForm = (): ServiceForm => ({
+  name: "",
+  description: "",
+  durationMin: "60",
+  price: "120",
+  active: true,
+});
+
+function isValidServiceForm(form: ServiceForm) {
+  return (
+    form.name.trim().length >= 2 &&
+    parseInt(form.durationMin, 10) >= 15 &&
+    parseInt(form.price, 10) >= 0
+  );
+}
+
 /* ---------- שירותים ---------- */
 function ServicesSection({ initial }: { initial: ServiceRow[] }) {
   const router = useRouter();
   const [services] = useState<ServiceRow[]>(initial);
   const [adding, setAdding] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
-  const [form, setForm] = useState({
-    name: "",
-    description: "",
-    durationMin: "60",
-    price: "120",
-  });
+  const [form, setForm] = useState<ServiceForm>(emptyServiceForm());
+  const [editForm, setEditForm] = useState<ServiceForm>(emptyServiceForm());
   const [saving, setSaving] = useState(false);
+  const [editSaving, setEditSaving] = useState(false);
+
+  const startEdit = (s: ServiceRow) => {
+    setAdding(false);
+    setEditingId(s.id);
+    setEditForm({
+      name: s.name,
+      description: s.description || "",
+      durationMin: String(s.durationMin),
+      price: String(s.price),
+      active: s.active,
+    });
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditForm(emptyServiceForm());
+  };
+
+  const saveEdit = async (id: string) => {
+    if (!isValidServiceForm(editForm)) return;
+    setEditSaving(true);
+    try {
+      const res = await fetch(`/api/admin/services/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: editForm.name,
+          description: editForm.description || null,
+          durationMin: parseInt(editForm.durationMin, 10),
+          price: parseInt(editForm.price, 10),
+          active: editForm.active,
+        }),
+      });
+      if (res.ok) {
+        cancelEdit();
+        router.refresh();
+      }
+    } finally {
+      setEditSaving(false);
+    }
+  };
 
   const addService = async () => {
     setSaving(true);
@@ -214,7 +288,7 @@ function ServicesSection({ initial }: { initial: ServiceRow[] }) {
         }),
       });
       if (res.ok) {
-        setForm({ name: "", description: "", durationMin: "60", price: "120" });
+        setForm(emptyServiceForm());
         setAdding(false);
         router.refresh();
       }
@@ -235,10 +309,8 @@ function ServicesSection({ initial }: { initial: ServiceRow[] }) {
     }
   };
 
-  const validForm =
-    form.name.trim().length >= 2 &&
-    parseInt(form.durationMin, 10) >= 15 &&
-    parseInt(form.price, 10) >= 0;
+  const validForm = isValidServiceForm(form);
+  const validEditForm = isValidServiceForm(editForm);
 
   return (
     <SectionCard icon={Sparkles} title="שירותים ומחירים">
@@ -247,35 +319,126 @@ function ServicesSection({ initial }: { initial: ServiceRow[] }) {
           <li
             key={s.id}
             className={[
-              "flex items-center gap-3 rounded-2xl bg-neutral-50 p-3",
+              "rounded-2xl bg-neutral-50 p-3",
               s.active ? "" : "opacity-50",
             ].join(" ")}
           >
-            <div className="min-w-0 flex-1">
-              <p className="font-medium text-noir-900">
-                {s.name}
-                {!s.active && (
-                  <span className="mr-2 text-xs text-neutral-400">
-                    (לא פעיל)
-                  </span>
-                )}
-              </p>
-              <p className="tabular text-xs text-neutral-600">
-                {s.durationMin} דק' · {s.price} ₪
-              </p>
-            </div>
-            <button
-              onClick={() => removeService(s.id)}
-              disabled={busyId === s.id}
-              className="flex h-9 w-9 items-center justify-center rounded-xl text-neutral-400 transition-colors hover:bg-rose-50 hover:text-rose-600 disabled:opacity-50"
-              aria-label={`מחיקת ${s.name}`}
-            >
-              {busyId === s.id ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Trash2 className="h-4 w-4" />
-              )}
-            </button>
+            {editingId === s.id ? (
+              <div className="flex flex-col gap-2.5">
+                <input
+                  className="input-field"
+                  placeholder="שם השירות"
+                  value={editForm.name}
+                  onChange={(e) =>
+                    setEditForm((f) => ({ ...f, name: e.target.value }))
+                  }
+                />
+                <input
+                  className="input-field"
+                  placeholder="תיאור קצר (אופציונלי)"
+                  value={editForm.description}
+                  onChange={(e) =>
+                    setEditForm((f) => ({ ...f, description: e.target.value }))
+                  }
+                />
+                <div className="flex gap-2">
+                  <div className="flex-1">
+                    <label className="label-field">משך (דקות)</label>
+                    <input
+                      type="number"
+                      inputMode="numeric"
+                      className="input-field tabular"
+                      value={editForm.durationMin}
+                      onChange={(e) =>
+                        setEditForm((f) => ({
+                          ...f,
+                          durationMin: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="label-field">מחיר (₪)</label>
+                    <input
+                      type="number"
+                      inputMode="numeric"
+                      className="input-field tabular"
+                      value={editForm.price}
+                      onChange={(e) =>
+                        setEditForm((f) => ({ ...f, price: e.target.value }))
+                      }
+                    />
+                  </div>
+                </div>
+                <label className="flex cursor-pointer items-center gap-2 text-sm text-neutral-600">
+                  <input
+                    type="checkbox"
+                    checked={editForm.active}
+                    onChange={(e) =>
+                      setEditForm((f) => ({ ...f, active: e.target.checked }))
+                    }
+                    className="h-4 w-4 rounded border-neutral-300 accent-gold"
+                  />
+                  שירות פעיל (מוצג ללקוחות)
+                </label>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => saveEdit(s.id)}
+                    disabled={!validEditForm || editSaving}
+                    className="btn-primary flex-1 py-3"
+                  >
+                    {editSaving ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                      "שמירה"
+                    )}
+                  </button>
+                  <button
+                    onClick={cancelEdit}
+                    disabled={editSaving}
+                    className="btn-secondary px-4 py-3"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-noir-900">
+                    {s.name}
+                    {!s.active && (
+                      <span className="mr-2 text-xs text-neutral-400">
+                        (לא פעיל)
+                      </span>
+                    )}
+                  </p>
+                  <p className="tabular text-xs text-neutral-600">
+                    {s.durationMin} דק' · {s.price} ₪
+                  </p>
+                </div>
+                <button
+                  onClick={() => startEdit(s)}
+                  disabled={busyId === s.id}
+                  className="flex h-9 w-9 items-center justify-center rounded-xl text-neutral-400 transition-colors hover:bg-gold/10 hover:text-gold-dark disabled:opacity-50"
+                  aria-label={`עריכת ${s.name}`}
+                >
+                  <Pencil className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => removeService(s.id)}
+                  disabled={busyId === s.id}
+                  className="flex h-9 w-9 items-center justify-center rounded-xl text-neutral-400 transition-colors hover:bg-rose-50 hover:text-rose-600 disabled:opacity-50"
+                  aria-label={`מחיקת ${s.name}`}
+                >
+                  {busyId === s.id ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
+            )}
           </li>
         ))}
       </ul>
@@ -340,7 +503,10 @@ function ServicesSection({ initial }: { initial: ServiceRow[] }) {
         </div>
       ) : (
         <button
-          onClick={() => setAdding(true)}
+          onClick={() => {
+            cancelEdit();
+            setAdding(true);
+          }}
           className="btn-secondary mt-3 w-full"
         >
           <Plus className="h-5 w-5" />
@@ -561,7 +727,8 @@ function BlockedDatesSection({ initial }: { initial: BlockedRow[] }) {
           dir="ltr"
           value={date}
           onChange={(e) => setDate(e.target.value)}
-          className="input-field [color-scheme:light]"
+          suppressHydrationWarning
+          className="input-field [color-scheme:light] dark:[color-scheme:dark]"
         />
         <input
           className="input-field"

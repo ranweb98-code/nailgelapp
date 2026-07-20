@@ -14,14 +14,29 @@ function appointmentDateTime(date: string, startTime: string): Date {
   return d;
 }
 
+export interface ReminderAppointment {
+  id: string;
+  customerName: string;
+  phone: string;
+  email: string | null;
+  serviceName: string;
+  date: string;
+  startTime: string;
+  price: number;
+  notes: string | null;
+}
+
 export interface ReminderRunResult {
   checked: number;
   sent: number;
   appointments: string[];
 }
 
-// שולח תזכורות לתורים שמתקרבים (בתוך חלון הזמן שהוגדר) ושעדיין לא נשלחה להם תזכורת
-export async function runReminders(): Promise<ReminderRunResult> {
+/** תורים שבחלון התזכורת ועדיין לא נשלחה להם תזכורת */
+export async function findDueReminderAppointments(): Promise<{
+  checked: number;
+  due: ReminderAppointment[];
+}> {
   const now = new Date();
   const windowEnd = new Date(
     now.getTime() + REMINDER_HOURS_BEFORE * 60 * 60 * 1000
@@ -34,30 +49,41 @@ export async function runReminders(): Promise<ReminderRunResult> {
     },
   });
 
-  const result: ReminderRunResult = { checked: candidates.length, sent: 0, appointments: [] };
-
-  for (const appt of candidates) {
+  const due = candidates.filter((appt) => {
     const when = appointmentDateTime(appt.date, appt.startTime);
-    // בטווח: מעכשיו ועד חלון התזכורת
-    if (when > now && when <= windowEnd) {
-      const ok = await sendCustomerReminder({
-        customerName: appt.customerName,
-        phone: appt.phone,
-        email: appt.email,
-        serviceName: appt.serviceName,
-        date: appt.date,
-        startTime: appt.startTime,
-        price: appt.price,
-        notes: appt.notes,
+    return when > now && when <= windowEnd;
+  });
+
+  return { checked: candidates.length, due };
+}
+
+/**
+ * תזכורות אימייל בלבד — בטוח לשימוש מ-instrumentation
+ * (בלי ייבוא של web-push).
+ */
+export async function runReminders(): Promise<ReminderRunResult> {
+  const { checked, due } = await findDueReminderAppointments();
+  const result: ReminderRunResult = { checked, sent: 0, appointments: [] };
+
+  for (const appt of due) {
+    if (!appt.email?.trim()) continue;
+    const ok = await sendCustomerReminder({
+      customerName: appt.customerName,
+      phone: appt.phone,
+      email: appt.email,
+      serviceName: appt.serviceName,
+      date: appt.date,
+      startTime: appt.startTime,
+      price: appt.price,
+      notes: appt.notes,
+    });
+    if (ok) {
+      await prisma.appointment.update({
+        where: { id: appt.id },
+        data: { reminderSentAt: new Date() },
       });
-      if (ok) {
-        await prisma.appointment.update({
-          where: { id: appt.id },
-          data: { reminderSentAt: new Date() },
-        });
-        result.sent++;
-        result.appointments.push(appt.id);
-      }
+      result.sent++;
+      result.appointments.push(appt.id);
     }
   }
 

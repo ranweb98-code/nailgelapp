@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import {
   getDayOfWeek,
+  getNowMinutesInAppTimezone,
   isPastDate,
   isToday,
   minutesToTime,
@@ -70,9 +71,8 @@ export async function getAvailableSlots(
     return { start, end: start + a.durationMin };
   });
 
-  // מסנן שעות שכבר עברו אם זה היום
-  const now = new Date();
-  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+  // מסנן שעות שכבר עברו אם זה היום (לפי שעון ישראל)
+  const nowMinutes = getNowMinutesInAppTimezone();
   const todayFlag = isToday(dateStr);
 
   const slots: string[] = [];

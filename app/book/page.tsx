@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { BookingFlow } from "@/components/BookingFlow";
 import { parseTags } from "@/lib/inspoTags";
+import { runCleanup } from "@/lib/cleanup";
+import { toDateString } from "@/lib/time";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +13,9 @@ export default async function BookPage({
 }) {
   const { service: initialServiceId } = await searchParams;
 
+  await runCleanup().catch(() => {});
+
+  const today = toDateString();
   const [services, workingHours, blocked, inspo] = await Promise.all([
     prisma.service.findMany({
       where: { active: true },
@@ -27,7 +32,10 @@ export default async function BookPage({
       where: { isOpen: true },
       select: { dayOfWeek: true },
     }),
-    prisma.blockedDate.findMany({ select: { date: true } }),
+    prisma.blockedDate.findMany({
+      where: { date: { gte: today } },
+      select: { date: true },
+    }),
     prisma.inspoImage.findMany({
       where: { active: true },
       orderBy: { order: "asc" },

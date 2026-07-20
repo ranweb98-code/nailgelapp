@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Share, Plus, X, Download } from "lucide-react";
+import { Share, Plus, X, Download, Bell } from "lucide-react";
+import { ensurePushSubscription, isStandaloneDisplay } from "@/lib/push-client";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -21,12 +22,7 @@ export function InstallPrompt() {
     if (typeof window === "undefined") return;
 
     const dismissed = localStorage.getItem(DISMISS_KEY);
-    const isStandalone =
-      window.matchMedia("(display-mode: standalone)").matches ||
-      // @ts-expect-error iOS Safari
-      window.navigator.standalone === true;
-
-    if (dismissed || isStandalone) return;
+    if (dismissed || isStandaloneDisplay()) return;
 
     const isIos = /iphone|ipad|ipod/.test(
       window.navigator.userAgent.toLowerCase()
@@ -62,9 +58,16 @@ export function InstallPrompt() {
   const install = async () => {
     if (!deferred) return;
     await deferred.prompt();
-    await deferred.userChoice;
+    const choice = await deferred.userChoice;
     setDeferred(null);
-    dismiss();
+    setVisible(false);
+
+    if (choice.outcome === "accepted") {
+      // מיד אחרי התקנה — מבקשים הרשאת התראות (חובה בהמשך דרך ה-Gate)
+      await ensurePushSubscription({ role: "customer" });
+    } else {
+      localStorage.setItem(DISMISS_KEY, "1");
+    }
   };
 
   if (!visible) return null;
@@ -80,8 +83,9 @@ export function InstallPrompt() {
           {showIosHint ? (
             <p className="text-sm leading-snug text-noir-900">
               להוספה למסך הבית: הקישו על{" "}
-              <Share className="inline h-4 w-4 text-gold" /> ואז על "הוסף למסך
-              הבית" <Plus className="inline h-3.5 w-3.5" />
+              <Share className="inline h-4 w-4 text-gold" /> ואז על &quot;הוסף
+              למסך הבית&quot; <Plus className="inline h-3.5 w-3.5" />. אחרי
+              הפתיחה מהמסך הבית — חובה לאפשר התראות.
             </p>
           ) : (
             <>
@@ -89,7 +93,8 @@ export function InstallPrompt() {
                 התקינו את האפליקציה
               </p>
               <p className="text-xs text-neutral-600">
-                גישה מהירה לקביעת תורים ממסך הבית
+                גישה מהירה + התראות על תורים{" "}
+                <Bell className="inline h-3 w-3 text-gold" />
               </p>
             </>
           )}

@@ -1,5 +1,5 @@
-// Service Worker בסיסי ל-Gel Studio PWA
-const CACHE = "gel-studio-v1";
+// Service Worker — caching + Web Push notifications
+const CACHE = "gel-studio-v2";
 const APP_SHELL = ["/", "/offline"];
 
 self.addEventListener("install", (event) => {
@@ -25,12 +25,10 @@ self.addEventListener("fetch", (event) => {
   if (request.method !== "GET") return;
 
   const url = new URL(request.url);
-  // לא מטמיעים בקשות API או דף הניהול
   if (url.pathname.startsWith("/api") || url.pathname.startsWith("/admin")) {
     return;
   }
 
-  // ניווט: network-first עם נפילה ל-cache
   if (request.mode === "navigate") {
     event.respondWith(
       fetch(request)
@@ -44,7 +42,6 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // נכסים סטטיים: cache-first
   if (
     url.pathname.startsWith("/icons") ||
     url.pathname.startsWith("/_next/static")
@@ -61,4 +58,66 @@ self.addEventListener("fetch", (event) => {
       )
     );
   }
+});
+
+// ---- Web Push ----
+self.addEventListener("push", (event) => {
+  let data = {
+    title: "Studio Noir",
+    body: "יש עדכון חדש",
+    url: "/",
+    tag: "studio-noir",
+  };
+
+  try {
+    if (event.data) {
+      const parsed = event.data.json();
+      data = { ...data, ...parsed };
+    }
+  } catch {
+    try {
+      const text = event.data?.text();
+      if (text) data.body = text;
+    } catch {
+      /* ignore */
+    }
+  }
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: "/icons/icon-192.png",
+      badge: "/icons/icon-192.png",
+      tag: data.tag || "studio-noir",
+      renotify: true,
+      data: { url: data.url || "/" },
+      dir: "rtl",
+      lang: "he",
+      vibrate: [120, 60, 120],
+    })
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const targetUrl = event.notification.data?.url || "/";
+
+  event.waitUntil(
+    (async () => {
+      const allClients = await self.clients.matchAll({
+        type: "window",
+        includeUncontrolled: true,
+      });
+      for (const client of allClients) {
+        if ("focus" in client) {
+          await client.focus();
+          if ("navigate" in client) {
+            await client.navigate(targetUrl);
+          }
+          return;
+        }
+      }
+      await self.clients.openWindow(targetUrl);
+    })()
+  );
 });

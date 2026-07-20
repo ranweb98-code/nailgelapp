@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Heebo, Frank_Ruhl_Libre, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
+import { NotificationPermissionGate } from "@/components/NotificationPermissionGate";
+import { getSettings } from "@/lib/settings";
 
 const sans = Heebo({
   subsets: ["hebrew", "latin"],
@@ -17,7 +19,6 @@ const serif = Frank_Ruhl_Libre({
   display: "swap",
 });
 
-// גופן תצוגה אלגנטי לשם המותג (כמו בתמונת ההשראה)
 const display = Cormorant_Garamond({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
@@ -40,28 +41,36 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport: Viewport = {
-  themeColor: "#ffffff",
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 5,
-  viewportFit: "cover",
-};
+export async function generateViewport(): Promise<Viewport> {
+  const settings = await getSettings();
+  return {
+    themeColor: settings.bgTheme === "dark" ? "#100D0B" : "#ffffff",
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 5,
+    viewportFit: "cover",
+  };
+}
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const settings = await getSettings();
+  const theme = settings.bgTheme;
+
   return (
     <html
       lang="he"
       dir="rtl"
+      data-theme={theme}
       className={`${sans.variable} ${serif.variable} ${display.variable}`}
     >
       <body>
         {children}
         <ServiceWorkerRegister />
+        <NotificationPermissionGate />
       </body>
     </html>
   );

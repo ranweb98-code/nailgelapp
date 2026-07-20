@@ -4,12 +4,15 @@ import { prisma } from "@/lib/prisma";
 import { toDateString } from "@/lib/time";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 import { AppointmentsBoard } from "@/components/admin/AppointmentsBoard";
+import { runCleanup } from "@/lib/cleanup";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "תורים · פאנל ניהול" };
 
 export default async function AdminDashboardPage() {
   if (!(await isAuthenticated())) redirect("/admin/login");
+
+  await runCleanup().catch(() => {});
 
   const [appointments, inspoImages] = await Promise.all([
     prisma.appointment.findMany({
@@ -40,7 +43,7 @@ export default async function AdminDashboardPage() {
   }));
 
   return (
-    <main className="min-h-dvh pb-12">
+    <main className="page-bg min-h-dvh pb-12">
       <AdminHeader />
       <div className="container-app pt-4">
         <AppointmentsBoard
