@@ -741,17 +741,19 @@ function BlockedDatesSection({ initial }: { initial: BlockedRow[] }) {
         </ul>
       )}
 
-      <div className="flex flex-col gap-2.5 rounded-2xl bg-neutral-50 p-3">
+      <div className="flex w-full min-w-0 flex-col gap-2.5 overflow-hidden rounded-2xl bg-neutral-50 p-3 dark:bg-noir-700">
+        <div className="w-full min-w-0 overflow-hidden rounded-2xl">
+          <input
+            type="date"
+            dir="ltr"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            suppressHydrationWarning
+            className="input-field box-border w-full min-w-0 max-w-full [color-scheme:light] dark:[color-scheme:dark]"
+          />
+        </div>
         <input
-          type="date"
-          dir="ltr"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          suppressHydrationWarning
-          className="input-field [color-scheme:light] dark:[color-scheme:dark]"
-        />
-        <input
-          className="input-field"
+          className="input-field box-border w-full min-w-0 max-w-full"
           placeholder="סיבה (אופציונלי)"
           value={reason}
           onChange={(e) => setReason(e.target.value)}
