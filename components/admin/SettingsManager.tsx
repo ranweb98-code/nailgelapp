@@ -15,6 +15,7 @@ import {
   Heart,
 } from "lucide-react";
 import { HEBREW_DAYS, formatDateHebrew } from "@/lib/time";
+import { normalizeInspoSrc } from "@/lib/inspoUrl";
 
 interface HourRow {
   dayOfWeek: number;
@@ -525,13 +526,21 @@ function InspoSection({ initial }: { initial: InspoRow[] }) {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [form, setForm] = useState({ src: "", label: "", tags: "" });
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [previewOk, setPreviewOk] = useState(false);
 
   useEffect(() => {
     setImages(initial);
   }, [initial]);
 
+  useEffect(() => {
+    setPreviewOk(false);
+    setError(null);
+  }, [form.src]);
+
   const add = async () => {
     setSaving(true);
+    setError(null);
     try {
       const res = await fetch("/api/admin/inspo", {
         method: "POST",
@@ -542,13 +551,16 @@ function InspoSection({ initial }: { initial: InspoRow[] }) {
           tags: form.tags,
         }),
       });
-      if (res.ok) {
-        const created = (await res.json()) as InspoRow;
-        setImages((prev) => [...prev, created]);
-        setForm({ src: "", label: "", tags: "" });
-        setAdding(false);
-        router.refresh();
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(json.error || "לא הצלחנו להוסיף את התמונה");
+        return;
       }
+      const created = json as InspoRow;
+      setImages((prev) => [...prev, created]);
+      setForm({ src: "", label: "", tags: "" });
+      setAdding(false);
+      router.refresh();
     } finally {
       setSaving(false);
     }
@@ -574,17 +586,20 @@ function InspoSection({ initial }: { initial: InspoRow[] }) {
           {images.map((img) => (
             <div
               key={img.id}
-              className="group relative aspect-[4/5] overflow-hidden rounded-2xl border border-neutral-200"
+              className="group relative aspect-[4/5] overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-100 dark:border-neutral-700 dark:bg-noir-700"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={img.src}
                 alt={img.label || "השראה"}
                 className="h-full w-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-noir-900/70 to-transparent" />
               {img.label && (
-                <span className="absolute bottom-1.5 right-1.5 text-[11px] font-medium text-noir-900">
+                <span className="absolute bottom-1.5 right-1.5 rounded bg-noir-900/55 px-1.5 py-0.5 text-[11px] font-medium text-white">
                   {img.label}
                 </span>
               )}
@@ -610,10 +625,34 @@ function InspoSection({ initial }: { initial: InspoRow[] }) {
           <input
             className="input-field"
             dir="ltr"
-            placeholder="/images/inspo/example.png או URL"
+            placeholder="https://i.imgur.com/xxxx.jpg"
             value={form.src}
             onChange={(e) => setForm((f) => ({ ...f, src: e.target.value }))}
           />
+          <p className="text-[11px] leading-relaxed text-neutral-500">
+            חובה קישור ישיר לתמונה (מסתיים ב-.jpg/.png או i.imgur.com/...). לא
+            קישור לאלבום / דף Drive.
+          </p>
+          {form.src.trim() && (
+            <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-noir-800">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={normalizeInspoSrc(form.src)}
+                alt="תצוגה מקדימה"
+                className="mx-auto max-h-40 object-contain"
+                onLoad={() => {
+                  setPreviewOk(true);
+                  setError(null);
+                }}
+                onError={() => {
+                  setPreviewOk(false);
+                  setError(
+                    "התמונה לא נטענת מהקישור. ב-Imgur: לחצו על התמונה עצמה → העתיקו Direct link (מתחיל ב-i.imgur.com)"
+                  );
+                }}
+              />
+            </div>
+          )}
           <input
             className="input-field"
             placeholder="כותרת (אופציונלי)"
@@ -627,16 +666,24 @@ function InspoSection({ initial }: { initial: InspoRow[] }) {
             value={form.tags}
             onChange={(e) => setForm((f) => ({ ...f, tags: e.target.value }))}
           />
+          {error && (
+            <p className="rounded-xl bg-rose-50 px-3 py-2 text-xs text-rose-700 dark:bg-rose-500/15 dark:text-rose-200">
+              {error}
+            </p>
+          )}
           <div className="flex gap-2">
             <button
               onClick={add}
-              disabled={!form.src.trim() || saving}
+              disabled={!form.src.trim() || saving || (!!form.src.trim() && !previewOk)}
               className="btn-primary flex-1 py-3"
             >
               {saving ? <Loader2 className="h-5 w-5 animate-spin" /> : "הוספה"}
             </button>
             <button
-              onClick={() => setAdding(false)}
+              onClick={() => {
+                setAdding(false);
+                setError(null);
+              }}
               className="btn-secondary px-4 py-3"
             >
               <X className="h-5 w-5" />

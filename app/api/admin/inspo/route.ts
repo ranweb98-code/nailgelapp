@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { isAuthenticated } from "@/lib/auth";
+import { inspoSrcErrorMessage, normalizeInspoSrc } from "@/lib/inspoUrl";
 
 export const dynamic = "force-dynamic";
 
@@ -18,13 +19,22 @@ export async function POST(req: NextRequest) {
 
   const parsed = schema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) {
-    return NextResponse.json({ error: "נתונים לא תקינים" }, { status: 400 });
+    return NextResponse.json(
+      { error: parsed.error.issues[0]?.message || "נתונים לא תקינים" },
+      { status: 400 }
+    );
+  }
+
+  const src = normalizeInspoSrc(parsed.data.src);
+  const srcError = inspoSrcErrorMessage(src);
+  if (srcError) {
+    return NextResponse.json({ error: srcError }, { status: 400 });
   }
 
   const max = await prisma.inspoImage.aggregate({ _max: { order: true } });
   const image = await prisma.inspoImage.create({
     data: {
-      src: parsed.data.src,
+      src,
       label: parsed.data.label || null,
       tags: parsed.data.tags || "",
       order: (max._max.order ?? 0) + 1,
