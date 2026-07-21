@@ -520,11 +520,15 @@ function ServicesSection({ initial }: { initial: ServiceRow[] }) {
 /* ---------- גלריית השראה ---------- */
 function InspoSection({ initial }: { initial: InspoRow[] }) {
   const router = useRouter();
-  const [images] = useState<InspoRow[]>(initial);
+  const [images, setImages] = useState<InspoRow[]>(initial);
   const [adding, setAdding] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [form, setForm] = useState({ src: "", label: "", tags: "" });
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    setImages(initial);
+  }, [initial]);
 
   const add = async () => {
     setSaving(true);
@@ -539,6 +543,8 @@ function InspoSection({ initial }: { initial: InspoRow[] }) {
         }),
       });
       if (res.ok) {
+        const created = (await res.json()) as InspoRow;
+        setImages((prev) => [...prev, created]);
         setForm({ src: "", label: "", tags: "" });
         setAdding(false);
         router.refresh();
@@ -552,7 +558,10 @@ function InspoSection({ initial }: { initial: InspoRow[] }) {
     setBusyId(id);
     try {
       const res = await fetch(`/api/admin/inspo/${id}`, { method: "DELETE" });
-      if (res.ok) router.refresh();
+      if (res.ok) {
+        setImages((prev) => prev.filter((img) => img.id !== id));
+        router.refresh();
+      }
     } finally {
       setBusyId(null);
     }
@@ -650,11 +659,15 @@ function InspoSection({ initial }: { initial: InspoRow[] }) {
 /* ---------- ימים חסומים ---------- */
 function BlockedDatesSection({ initial }: { initial: BlockedRow[] }) {
   const router = useRouter();
-  const [blocked] = useState<BlockedRow[]>(initial);
+  const [blocked, setBlocked] = useState<BlockedRow[]>(initial);
   const [date, setDate] = useState("");
   const [reason, setReason] = useState("");
   const [saving, setSaving] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setBlocked(initial);
+  }, [initial]);
 
   const add = async () => {
     if (!date) return;
@@ -666,6 +679,10 @@ function BlockedDatesSection({ initial }: { initial: BlockedRow[] }) {
         body: JSON.stringify({ date, reason: reason || null }),
       });
       if (res.ok) {
+        const created = (await res.json()) as BlockedRow;
+        setBlocked((prev) =>
+          [...prev, created].sort((a, b) => a.date.localeCompare(b.date))
+        );
         setDate("");
         setReason("");
         router.refresh();
@@ -681,7 +698,10 @@ function BlockedDatesSection({ initial }: { initial: BlockedRow[] }) {
       const res = await fetch(`/api/admin/blocked-dates/${id}`, {
         method: "DELETE",
       });
-      if (res.ok) router.refresh();
+      if (res.ok) {
+        setBlocked((prev) => prev.filter((b) => b.id !== id));
+        router.refresh();
+      }
     } finally {
       setBusyId(null);
     }
