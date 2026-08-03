@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Heebo, Frank_Ruhl_Libre, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
+import { HomeScreenInstallGate } from "@/components/HomeScreenInstallGate";
 import { NotificationPermissionGate } from "@/components/NotificationPermissionGate";
 import { getSettings } from "@/lib/settings";
 
@@ -70,6 +71,7 @@ export default async function RootLayout({
       <body>
         {children}
         <ServiceWorkerRegister />
+        <HomeScreenInstallGate />
         <NotificationPermissionGate />
       </body>
     </html>

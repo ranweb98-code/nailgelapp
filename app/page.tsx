@@ -11,7 +11,6 @@ import { prisma } from "@/lib/prisma";
 import { getSettings } from "@/lib/settings";
 import { HEBREW_DAYS } from "@/lib/time";
 import { ServiceCard } from "@/components/ServiceCard";
-import { InstallPrompt } from "@/components/InstallPrompt";
 import { runCleanup } from "@/lib/cleanup";
 
 export const dynamic = "force-dynamic";
@@ -187,8 +186,6 @@ export default async function HomePage() {
           <ChevronLeft className="h-3 w-3" />
         </Link>
       </footer>
-
-      <InstallPrompt />
     </main>
   );
 }
