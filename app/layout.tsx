@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
+    statusBarStyle: "black-translucent",
     title: "Studio Noir",
   },
   icons: {
@@ -43,9 +43,8 @@ export const metadata: Metadata = {
 };
 
 export async function generateViewport(): Promise<Viewport> {
-  const settings = await getSettings();
   return {
-    themeColor: settings.bgTheme === "dark" ? "#100D0B" : "#ffffff",
+    themeColor: "#100D0B",
     width: "device-width",
     initialScale: 1,
     maximumScale: 5,

@@ -35,16 +35,16 @@ export default async function HomePage() {
   return (
     <main className="page-bg min-h-dvh pb-28">
       {/* Hero - תמונת ציפורניים + שם בסריף + קצה עגול */}
-      <section className="hero-curve relative z-[1] h-[62vh] min-h-[420px] w-full overflow-hidden">
+      <section className="hero-curve hero-edge relative z-[1] h-[62vh] min-h-[420px] w-full overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/images/hero-nails.png"
           alt="עבודת ציפורניים"
-          className="absolute inset-0 h-full w-full object-cover object-center"
+          className="hero-edge-media absolute inset-x-0 bottom-0 w-full object-cover object-center"
         />
-        <div className="hero-scrim absolute inset-0" aria-hidden />
+        <div className="hero-scrim hero-edge-media absolute inset-x-0 bottom-0" aria-hidden />
 
-        <div className="absolute inset-x-0 bottom-0 z-[3] px-6 pb-6 pt-[max(env(safe-area-inset-top),1rem)]">
+        <div className="absolute inset-x-0 bottom-0 z-[3] px-6 pb-6">
           <div className="container-app px-0">
             <p className="mb-2 text-xs uppercase tracking-[0.4em] text-gold-light">
               {settings.businessTagline}

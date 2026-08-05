@@ -120,6 +120,17 @@
     border-bottom-right-radius: 50% 1.75rem;
   }
 
+  /* PWA / notch: מושך את ההירו מתחת ל-status bar, התמונה ממלאת עד הקצה */
+  .hero-edge {
+    margin-top: calc(-1 * env(safe-area-inset-top, 0px));
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  .hero-edge-media {
+    top: calc(-1 * env(safe-area-inset-top, 0px));
+    height: calc(100% + env(safe-area-inset-top, 0px));
+  }
+
   .hero-scrim {
     background:
       linear-gradient(180deg, rgba(16, 13, 11, 0.45) 0%, transparent 38%),
