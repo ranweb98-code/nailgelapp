@@ -9,20 +9,20 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // רקעים כהים-חמים (noir)
+        // רקעים כהים-חמים (noir) — גוון עדין ורדרד ליישור עם הסרטון
         noir: {
-          DEFAULT: "#171310",
-          900: "#100D0B",
-          800: "#171310",
-          700: "#211C18",
-          600: "#2C2620",
-          500: "#3A332B",
+          DEFAULT: "#1A1416",
+          900: "#110C0D",
+          800: "#1A1416",
+          700: "#241C1F",
+          600: "#2E2428",
+          500: "#3D3236",
         },
-        // טקסט שמנת חם
+        // טקסט / משטחים בהירים — שמנת-ורוד, לא צהוב
         cream: {
-          DEFAULT: "#F4EEE4",
-          soft: "#C7BCAC",
-          faint: "#8E8475",
+          DEFAULT: "#F7F1EE",
+          soft: "#C9BAB4",
+          faint: "#8F817C",
         },
         rose: {
           DEFAULT: "#C98A93",
@@ -32,10 +32,17 @@ const config: Config = {
           500: "#B76E79",
           600: "#9E5763",
         },
+        // מבטא ראשי — ורוד-אפרפר / rose-gold (במקום זהב צהוב)
         gold: {
-          DEFAULT: "#C9A86A",
-          light: "#E0C893",
-          dark: "#A8884C",
+          DEFAULT: "#C4908A",
+          light: "#E4C4C0",
+          dark: "#9E5E63",
+        },
+        blush: {
+          DEFAULT: "#FAF5F3",
+          card: "#FFFCFA",
+          muted: "#F3E8E4",
+          border: "#E8DAD4",
         },
       },
       fontFamily: {
@@ -44,9 +51,9 @@ const config: Config = {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
       },
       boxShadow: {
-        glass: "0 8px 32px rgba(0, 0, 0, 0.37)",
-        float: "0 10px 40px rgba(0, 0, 0, 0.45)",
-        glow: "0 0 0 1px rgba(201, 168, 106, 0.25), 0 8px 30px rgba(0,0,0,0.4)",
+        glass: "0 8px 32px rgba(17, 12, 13, 0.32)",
+        float: "0 10px 40px rgba(17, 12, 13, 0.38)",
+        glow: "0 0 0 1px rgba(196, 144, 138, 0.35), 0 8px 30px rgba(17, 12, 13, 0.4)",
       },
       borderRadius: {
         "4xl": "2rem",

@@ -35,7 +35,7 @@ export function ServiceCard({
   return (
     <Link
       href={`/book?service=${id}`}
-      className="group flex items-center gap-4 rounded-2xl border border-neutral-200 bg-neutral-50 p-4 transition-all duration-200 hover:border-gold/40 hover:bg-white active:scale-[0.99]"
+      className="group flex items-center gap-4 rounded-2xl border border-blush-border bg-blush-muted p-4 transition-all duration-200 hover:border-gold/40 hover:bg-blush-card active:scale-[0.99]"
     >
       <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-neutral-200 bg-gold/10 text-gold-dark transition-colors group-hover:bg-gold group-hover:text-noir-900">
         <Icon className="h-5 w-5" strokeWidth={1.75} />

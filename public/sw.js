@@ -1,5 +1,5 @@
 // Service Worker — caching + Web Push notifications
-const CACHE = "gel-studio-v2";
+const CACHE = "gel-studio-v4";
 const APP_SHELL = ["/", "/offline"];
 
 self.addEventListener("install", (event) => {
@@ -51,11 +51,28 @@ self.addEventListener("fetch", (event) => {
         (cached) =>
           cached ||
           fetch(request).then((res) => {
-            const copy = res.clone();
-            caches.open(CACHE).then((cache) => cache.put(request, copy));
+            if (res.ok) {
+              const copy = res.clone();
+              caches.open(CACHE).then((cache) => cache.put(request, copy));
+            }
             return res;
           })
       )
+    );
+    return;
+  }
+
+  if (url.pathname.startsWith("/images/") || url.pathname.startsWith("/videos/")) {
+    event.respondWith(
+      fetch(request)
+        .then((res) => {
+          if (res.ok) {
+            const copy = res.clone();
+            caches.open(CACHE).then((cache) => cache.put(request, copy));
+          }
+          return res;
+        })
+        .catch(() => caches.match(request))
     );
   }
 });

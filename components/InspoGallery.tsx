@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Check, Plus } from "lucide-react";
 import { type InspoImageLite, tagLabel } from "@/lib/inspoTags";
+import { InspoPhoto } from "@/components/InspoPhoto";
 
 interface Props {
   images: InspoImageLite[];
@@ -58,14 +59,13 @@ export function InspoGallery({ images, selected, onToggle }: Props) {
               type="button"
               onClick={() => onToggle(img.id)}
               aria-pressed={isSelected}
-              className={`group relative aspect-[4/5] overflow-hidden rounded-2xl border transition-all duration-200 active:scale-[0.98] ${
+              className={`group relative aspect-[4/5] overflow-hidden rounded-2xl border bg-neutral-100 transition-all duration-200 active:scale-[0.98] dark:bg-noir-700 ${
                 isSelected
                   ? "border-gold ring-2 ring-gold/50"
                   : "border-neutral-200"
               }`}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <InspoPhoto
                 src={img.src}
                 alt={img.label || "השראה"}
                 className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"

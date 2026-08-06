@@ -1,9 +1,7 @@
 import type { Metadata, Viewport } from "next";
-import { Heebo, Frank_Ruhl_Libre, Cormorant_Garamond } from "next/font/google";
+import { Heebo, Frank_Ruhl_Libre, Bodoni_Moda } from "next/font/google";
 import "./globals.css";
-import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
-import { HomeScreenInstallGate } from "@/components/HomeScreenInstallGate";
-import { NotificationPermissionGate } from "@/components/NotificationPermissionGate";
+import { ClientShell } from "@/components/ClientShell";
 import { getSettings } from "@/lib/settings";
 
 const sans = Heebo({
@@ -20,9 +18,10 @@ const serif = Frank_Ruhl_Libre({
   display: "swap",
 });
 
-const display = Cormorant_Garamond({
+const display = Bodoni_Moda({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
   variable: "--font-display",
   display: "swap",
 });
@@ -44,7 +43,7 @@ export const metadata: Metadata = {
 
 export async function generateViewport(): Promise<Viewport> {
   return {
-    themeColor: "#100D0B",
+    themeColor: "#110C0D",
     width: "device-width",
     initialScale: 1,
     maximumScale: 5,
@@ -69,9 +68,7 @@ export default async function RootLayout({
     >
       <body>
         {children}
-        <ServiceWorkerRegister />
-        <HomeScreenInstallGate />
-        <NotificationPermissionGate />
+        <ClientShell />
       </body>
     </html>
   );

@@ -11,6 +11,7 @@ import { prisma } from "@/lib/prisma";
 import { getSettings } from "@/lib/settings";
 import { HEBREW_DAYS } from "@/lib/time";
 import { ServiceCard } from "@/components/ServiceCard";
+import { InspoPhoto } from "@/components/InspoPhoto";
 import { runCleanup } from "@/lib/cleanup";
 
 export const dynamic = "force-dynamic";
@@ -34,12 +35,16 @@ export default async function HomePage() {
 
   return (
     <main className="page-bg min-h-dvh pb-28">
-      {/* Hero - תמונת ציפורניים + שם בסריף + קצה עגול */}
-      <section className="hero-curve hero-edge relative z-[1] h-[62vh] min-h-[420px] w-full overflow-hidden">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/hero-nails.png"
-          alt="עבודת ציפורניים"
+      {/* Hero - וידאו + שם בסריף + קצה עגול */}
+      <section className="hero-curve hero-edge relative z-[1] h-[72vh] min-h-[480px] w-full overflow-hidden bg-noir-900">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          aria-hidden
+          src="/videos/hero.mp4"
           className="hero-edge-media absolute inset-x-0 bottom-0 w-full object-cover object-center"
         />
         <div className="hero-scrim hero-edge-media absolute inset-x-0 bottom-0" aria-hidden />
@@ -49,7 +54,7 @@ export default async function HomePage() {
             <p className="mb-2 text-xs uppercase tracking-[0.4em] text-gold-light">
               {settings.businessTagline}
             </p>
-            <h1 className="font-display text-6xl font-medium leading-[0.95] text-cream">
+            <h1 className="hero-brand font-display text-[2.65rem] font-normal italic leading-[0.9] tracking-[0.02em] text-cream sm:text-6xl">
               {settings.businessName}
             </h1>
             <p className="mt-3 max-w-xs text-balance text-sm leading-relaxed text-cream-soft">
@@ -112,10 +117,9 @@ export default async function HomePage() {
               <Link
                 key={img.id}
                 href="/book"
-                className="group relative aspect-[3/4] w-36 shrink-0 overflow-hidden rounded-2xl border border-neutral-200"
+                className="group relative aspect-[3/4] w-36 shrink-0 overflow-hidden rounded-2xl border border-blush-border bg-blush-muted dark:border-neutral-700 dark:bg-noir-700"
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <InspoPhoto
                   src={img.src}
                   alt={img.label || "השראה"}
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
