@@ -67,6 +67,10 @@
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-rose-200 px-6 py-4 text-base font-semibold text-noir-900 shadow-float transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100;
   }
+  [data-theme="dark"] .btn-primary {
+    @apply bg-gold text-noir-900 shadow-glow;
+    color: #110c0d;
+  }
 
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2 rounded-2xl border border-blush-border bg-blush-muted px-6 py-4 text-base font-semibold text-noir-900 transition-all duration-200 active:scale-[0.98] disabled:opacity-40;
@@ -112,6 +116,9 @@
   }
   .chip-active {
     @apply border-gold/40 bg-gold/10 text-gold-dark;
+  }
+  [data-theme="dark"] .chip-active {
+    @apply border-gold/50 bg-gold/20 text-gold-light;
   }
 
   .hero-curve {
@@ -190,10 +197,10 @@
   color: #f7f1ee;
 }
 [data-theme="dark"] .text-neutral-600 {
-  color: #a89a9c;
+  color: #c4b8bc;
 }
 [data-theme="dark"] .text-neutral-400 {
-  color: #7a6e72;
+  color: #9a8d92;
 }
 [data-theme="dark"] .bg-neutral-50 {
   background-color: #241c1f;
@@ -212,4 +219,62 @@
 }
 [data-theme="dark"] .hover\:text-noir-900:hover {
   color: #f7f1ee;
+}
+
+/* קריאות טקסט ומשטחים בעיצוב שחור (data-theme, לא רק dark: בקומפוננטות) */
+[data-theme="dark"] .text-gold-dark {
+  color: #e4c4c0;
+}
+[data-theme="dark"] .text-gold {
+  color: #d4a59f;
+}
+[data-theme="dark"] .text-gold-light {
+  color: #e8d0cc;
+}
+[data-theme="dark"] .text-neutral-500 {
+  color: #a89a9c;
+}
+[data-theme="dark"] .text-neutral-300 {
+  color: #c9bcbf;
+}
+[data-theme="dark"] .text-cream-soft {
+  color: #c9bab4;
+}
+[data-theme="dark"] .hover\:text-gold-dark:hover {
+  color: #f0deda;
+}
+[data-theme="dark"] .border-blush-border {
+  border-color: #3d3236;
+}
+[data-theme="dark"] .bg-blush-muted {
+  background-color: #241c1f;
+}
+[data-theme="dark"] .bg-blush-card {
+  background-color: #1a1416;
+}
+[data-theme="dark"] .bg-blush {
+  background-color: #110c0d;
+}
+[data-theme="dark"] .bg-white {
+  background-color: #1a1416;
+}
+[data-theme="dark"] .bg-white\/90 {
+  background-color: rgba(26, 20, 22, 0.92);
+}
+[data-theme="dark"] .bg-white\/80 {
+  background-color: rgba(26, 20, 22, 0.88);
+}
+[data-theme="dark"] .border-neutral-300 {
+  border-color: #4a3d42;
+}
+[data-theme="dark"] .border-neutral-800 {
+  border-color: #3d3236;
+}
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3 {
+  color: #f7f1ee;
+}
+[data-theme="dark"] .glass-light {
+  @apply border-neutral-600 bg-noir-800 text-cream;
 }
