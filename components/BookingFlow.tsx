@@ -244,9 +244,9 @@ export function BookingFlow({
       <div className="container-app pt-5">
         {/* ----- שלב 1: בחירת שירות ----- */}
         {step === "service" && (
-          <div className="animate-fade-up">
+          <div className="services-panel animate-fade-up">
             <h2 className="mb-1 text-2xl text-noir-900">איזה טיפול תרצו?</h2>
-            <p className="mb-5 text-sm text-neutral-600">בחרו שירות כדי להמשיך</p>
+            <p className="mb-5 font-sans text-sm text-neutral-600">בחרו שירות כדי להמשיך</p>
             <ul className="flex flex-col gap-3">
               {services.map((s) => (
                 <li key={s.id}>
@@ -256,7 +256,7 @@ export function BookingFlow({
                     className="glass flex w-full items-center gap-4 rounded-2xl p-4 text-right transition-all duration-200 hover:border-gold/30 active:scale-[0.99]"
                   >
                     <div className="min-w-0 flex-1">
-                      <h3 className="font-sans text-base font-semibold text-noir-900">
+                      <h3 className="font-yad text-xl font-bold leading-tight tracking-wide text-noir-900">
                         {s.name}
                       </h3>
                       {s.description && (

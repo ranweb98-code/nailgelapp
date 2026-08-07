@@ -48,6 +48,7 @@ const config: Config = {
       fontFamily: {
         serif: ["var(--font-serif)", "Georgia", "serif"],
         display: ["var(--font-display)", "var(--font-serif)", "serif"],
+        yad: ["var(--font-yad)", "var(--font-serif)", "serif"],
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
       },
       boxShadow: {

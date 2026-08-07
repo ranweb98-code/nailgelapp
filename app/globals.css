@@ -33,7 +33,7 @@
   h1,
   h2,
   h3 {
-    @apply font-serif;
+    @apply font-yad font-bold tracking-wide;
   }
 
   .tabular {
@@ -65,7 +65,7 @@
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-rose-200 px-6 py-4 text-base font-semibold text-noir-900 shadow-float transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100;
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-rose-200 px-6 py-4 font-yad text-xl font-bold tracking-wide text-noir-900 shadow-float transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100;
   }
   [data-theme="dark"] .btn-primary {
     @apply bg-gold text-noir-900 shadow-glow;
@@ -151,6 +151,10 @@
 
   .hero-brand {
     text-shadow: 0 2px 28px rgba(0, 0, 0, 0.45);
+  }
+
+  .services-panel .tabular.font-semibold {
+    @apply font-yad text-lg font-bold tracking-wide text-gold-dark;
   }
 
   .admin-theme {
@@ -277,4 +281,12 @@
 }
 [data-theme="dark"] .glass-light {
   @apply border-neutral-600 bg-noir-800 text-cream;
+}
+
+@layer utilities {
+  .font-yad {
+    font-synthesis: weight;
+    -webkit-text-stroke: 0.32px currentColor;
+    paint-order: stroke fill;
+  }
 }

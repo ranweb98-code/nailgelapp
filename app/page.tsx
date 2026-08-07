@@ -74,7 +74,7 @@ export default async function HomePage() {
 
       {/* Services */}
       <section className="container-app mt-6">
-        <div className="glass rounded-3xl p-5">
+        <div className="services-panel glass rounded-3xl p-5">
           <ul className="flex flex-col gap-3">
             {services.map((s, i) => (
               <li
