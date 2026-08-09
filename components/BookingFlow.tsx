@@ -253,7 +253,7 @@ export function BookingFlow({
                   <button
                     type="button"
                     onClick={() => selectService(s)}
-                    className="glass flex w-full items-center gap-4 rounded-2xl p-4 text-right transition-all duration-200 hover:border-gold/30 active:scale-[0.99]"
+                    className="service-row glass flex w-full items-center gap-4 rounded-2xl p-4 text-right"
                   >
                     <div className="min-w-0 flex-1">
                       <h3 className="font-yad text-xl font-bold leading-tight tracking-wide text-noir-900">

@@ -63,7 +63,7 @@ export function ThemeSettingsSection({
           <span className="flex h-12 w-full items-center justify-center rounded-xl border border-neutral-200 bg-white shadow-sm">
             <Sun className="h-5 w-5 text-noir-900" />
           </span>
-          <span className="text-sm font-medium text-noir-900 dark:text-cream">
+          <span className="text-sm font-bold text-noir-900 dark:text-cream">
             לבן
           </span>
         </button>
@@ -81,7 +81,7 @@ export function ThemeSettingsSection({
           <span className="flex h-12 w-full items-center justify-center rounded-xl bg-noir-900 shadow-sm">
             <Moon className="h-5 w-5 text-cream" />
           </span>
-          <span className="text-sm font-medium text-noir-900 dark:text-cream">
+          <span className="text-sm font-bold text-noir-900 dark:text-cream">
             שחור
           </span>
         </button>

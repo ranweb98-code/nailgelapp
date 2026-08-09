@@ -35,9 +35,9 @@ export function ServiceCard({
   return (
     <Link
       href={`/book?service=${id}`}
-      className="group flex items-center gap-4 rounded-2xl border border-blush-border bg-blush-muted p-4 transition-all duration-200 hover:border-gold/40 hover:bg-blush-card active:scale-[0.99]"
+      className="service-row flex items-center gap-4 rounded-2xl border border-blush-border bg-blush-muted p-4"
     >
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-neutral-200 bg-gold/10 text-gold-dark transition-colors group-hover:bg-gold group-hover:text-noir-900">
+      <div className="service-row__icon flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-neutral-200 bg-gold/10 text-gold-dark">
         <Icon className="h-5 w-5" strokeWidth={1.75} />
       </div>
       <div className="min-w-0 flex-1">
@@ -57,7 +57,7 @@ export function ServiceCard({
           </span>
         </div>
       </div>
-      <ChevronLeft className="h-5 w-5 shrink-0 text-neutral-400 transition-transform group-hover:-translate-x-0.5 group-hover:text-gold-dark" />
+      <ChevronLeft className="service-row__chevron h-5 w-5 shrink-0 text-neutral-400" />
     </Link>
   );
 }

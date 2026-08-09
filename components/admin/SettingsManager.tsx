@@ -74,7 +74,7 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <section className="glass rounded-3xl p-5">
+    <section className="glass min-w-0 overflow-hidden rounded-3xl p-5">
       <h2 className="mb-4 flex items-center gap-2 text-lg text-noir-900">
         <Icon className="h-5 w-5 text-gold" />
         {title}
@@ -124,31 +124,41 @@ function WorkingHoursSection({ initial }: { initial: HourRow[] }) {
         {hours.map((h) => (
           <li
             key={h.dayOfWeek}
-            className="flex items-center gap-2 rounded-2xl bg-neutral-50 p-2.5 dark:bg-noir-700"
+            className="min-w-0 rounded-2xl bg-neutral-50 p-2.5 dark:bg-noir-700"
           >
-            <button
-              type="button"
-              dir="ltr"
-              onClick={() => update(h.dayOfWeek, { isOpen: !h.isOpen })}
-              className={[
-                "flex h-7 w-12 shrink-0 items-center rounded-full p-0.5 transition-colors",
-                h.isOpen ? "bg-gold" : "bg-neutral-200 dark:bg-neutral-600",
-              ].join(" ")}
-              aria-pressed={h.isOpen}
-              aria-label={`פתוח ביום ${HEBREW_DAYS[h.dayOfWeek]}`}
-            >
-              <span
+            <div className="flex min-w-0 items-center gap-2">
+              <button
+                type="button"
+                dir="ltr"
+                onClick={() => update(h.dayOfWeek, { isOpen: !h.isOpen })}
                 className={[
-                  "h-6 w-6 rounded-full bg-white shadow transition-transform",
-                  h.isOpen ? "translate-x-5" : "translate-x-0",
+                  "flex h-7 w-12 shrink-0 items-center rounded-full p-0.5 transition-colors",
+                  h.isOpen ? "bg-gold" : "bg-neutral-200 dark:bg-neutral-600",
                 ].join(" ")}
-              />
-            </button>
-            <span className="w-12 shrink-0 text-sm font-medium text-noir-900">
-              {HEBREW_DAYS[h.dayOfWeek]}
-            </span>
+                aria-pressed={h.isOpen}
+                aria-label={`פתוח ביום ${HEBREW_DAYS[h.dayOfWeek]}`}
+              >
+                <span
+                  className={[
+                    "h-6 w-6 rounded-full bg-white shadow transition-transform",
+                    h.isOpen ? "translate-x-5" : "translate-x-0",
+                  ].join(" ")}
+                />
+              </button>
+              <span className="shrink-0 text-sm text-noir-900">
+                {HEBREW_DAYS[h.dayOfWeek]}
+              </span>
+              {!h.isOpen && (
+                <span className="flex-1 text-left text-sm text-neutral-400">
+                  סגור
+                </span>
+              )}
+            </div>
             {h.isOpen ? (
-              <div className="flex flex-1 items-center justify-end gap-1.5" dir="ltr">
+              <div
+                className="mt-2 grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-1.5"
+                dir="ltr"
+              >
                 {mounted ? (
                   <>
                     <input
@@ -157,7 +167,7 @@ function WorkingHoursSection({ initial }: { initial: HourRow[] }) {
                       onChange={(e) =>
                         update(h.dayOfWeek, { startTime: e.target.value })
                       }
-                      className="tabular rounded-xl border border-neutral-200 bg-white px-2 py-1.5 text-sm text-noir-900 [color-scheme:light] dark:border-neutral-600 dark:bg-noir-800 dark:text-cream dark:[color-scheme:dark]"
+                      className="rounded-xl border border-neutral-200 bg-white px-1.5 py-1.5 text-xs text-noir-900 [color-scheme:light] dark:border-neutral-600 dark:bg-noir-800 dark:text-cream dark:[color-scheme:dark]"
                     />
                     <span className="text-neutral-400">-</span>
                     <input
@@ -166,20 +176,16 @@ function WorkingHoursSection({ initial }: { initial: HourRow[] }) {
                       onChange={(e) =>
                         update(h.dayOfWeek, { endTime: e.target.value })
                       }
-                      className="tabular rounded-xl border border-neutral-200 bg-white px-2 py-1.5 text-sm text-noir-900 [color-scheme:light] dark:border-neutral-600 dark:bg-noir-800 dark:text-cream dark:[color-scheme:dark]"
+                      className="rounded-xl border border-neutral-200 bg-white px-1.5 py-1.5 text-xs text-noir-900 [color-scheme:light] dark:border-neutral-600 dark:bg-noir-800 dark:text-cream dark:[color-scheme:dark]"
                     />
                   </>
                 ) : (
-                  <span className="tabular text-sm text-noir-900">
+                  <span className="col-span-3 text-left text-sm text-noir-900 tabular">
                     {h.startTime} - {h.endTime}
                   </span>
                 )}
               </div>
-            ) : (
-              <span className="flex-1 text-left text-sm text-neutral-400">
-                סגור
-              </span>
-            )}
+            ) : null}
           </li>
         ))}
       </ul>
@@ -406,7 +412,7 @@ function ServicesSection({ initial }: { initial: ServiceRow[] }) {
             ) : (
               <div className="flex items-center gap-3">
                 <div className="min-w-0 flex-1">
-                  <p className="font-medium text-noir-900">
+                  <p className="text-noir-900">
                     {s.name}
                     {!s.active && (
                       <span className="mr-2 text-xs text-neutral-400">
@@ -599,7 +605,7 @@ function InspoSection({ initial }: { initial: InspoRow[] }) {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-noir-900/70 to-transparent" />
               {img.label && (
-                <span className="absolute bottom-1.5 right-1.5 rounded bg-noir-900/55 px-1.5 py-0.5 text-[11px] font-medium text-white">
+                <span className="absolute bottom-1.5 right-1.5 rounded bg-noir-900/55 px-1.5 py-0.5 text-[11px] font-bold text-white">
                   {img.label}
                 </span>
               )}
@@ -764,7 +770,7 @@ function BlockedDatesSection({ initial }: { initial: BlockedRow[] }) {
               className="flex items-center gap-3 rounded-2xl bg-neutral-50 p-3"
             >
               <div className="min-w-0 flex-1">
-                <p className="font-medium text-noir-900">
+                <p className="text-noir-900">
                   {formatDateHebrew(b.date)}
                 </p>
                 {b.reason && (

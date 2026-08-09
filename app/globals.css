@@ -157,8 +157,55 @@
     @apply font-yad text-lg font-bold tracking-wide text-gold-dark;
   }
 
+  /* כרטיס שירות: hover דביק רק במגע — מופיע רק עם עכבר; בטלפון משוב קצר בלחיצה */
+  .service-row {
+    @apply touch-manipulation transition-[transform,background-color,border-color] duration-150;
+  }
+  .service-row:active {
+    @apply scale-[0.99] border-gold/30 bg-blush-card;
+  }
+  .service-row__icon {
+    @apply transition-colors duration-150;
+  }
+  .service-row:active .service-row__icon {
+    @apply bg-gold/30 text-noir-900;
+  }
+  .service-row__chevron {
+    @apply transition-[transform,color] duration-150;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .service-row:hover {
+      @apply border-gold/40 bg-blush-card;
+    }
+    .service-row:hover .service-row__icon {
+      @apply bg-gold text-noir-900;
+    }
+    .service-row:hover .service-row__chevron {
+      @apply -translate-x-0.5 text-gold-dark;
+    }
+  }
+  .service-row.glass:active {
+    @apply border-gold/30 bg-blush-muted;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .service-row.glass:hover {
+      @apply border-gold/30 bg-blush-muted;
+    }
+  }
+
   .admin-theme {
-    @apply bg-white text-noir-900;
+    @apply bg-white font-yad text-base font-bold tracking-wide text-noir-900;
+  }
+  .admin-theme input,
+  .admin-theme textarea,
+  .admin-theme select {
+    @apply font-sans font-normal;
+    font-synthesis: none;
+    -webkit-text-stroke: 0;
+    paint-order: normal;
+  }
+  .admin-theme input[type="time"] {
+    @apply min-w-0 w-full max-w-full box-border tabular;
   }
   [data-theme="dark"] .admin-theme {
     @apply bg-noir-900 text-cream;

@@ -23,7 +23,7 @@ export function AdminHeader() {
     <header className="sticky top-0 z-20 border-b border-neutral-200 bg-white/90 px-5 pb-2 pt-[max(env(safe-area-inset-top),0.75rem)] backdrop-blur-xl dark:border-neutral-800 dark:bg-noir-900/90">
       <div className="container-app px-0">
         <div className="flex items-center justify-between gap-2">
-          <span className="shrink-0 font-serif text-lg font-medium text-noir-900">
+          <span className="shrink-0 text-lg text-noir-900">
             פאנל ניהול
           </span>
           <div className="flex shrink-0 items-center gap-0.5">
@@ -56,7 +56,7 @@ export function AdminHeader() {
                 key={t.href}
                 href={t.href}
                 className={[
-                  "flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium transition-colors",
+                  "flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-bold transition-colors",
                   active
                     ? "bg-gold text-noir-900"
                     : "text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800",

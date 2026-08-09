@@ -118,7 +118,7 @@ export function AppointmentsBoard({
               key={t.key}
               onClick={() => setTab(t.key)}
               className={[
-                "flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-colors",
+                "flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-bold transition-colors",
                 active
                   ? "bg-gold text-noir-900"
                   : "bg-neutral-50 text-neutral-600 hover:bg-neutral-100",
@@ -145,7 +145,7 @@ export function AppointmentsBoard({
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-neutral-50">
             <CalendarX className="h-7 w-7 text-neutral-400" />
           </div>
-          <p className="text-neutral-600">אין תורים להצגה כאן</p>
+          <p className="text-base text-neutral-600">אין תורים להצגה כאן</p>
         </div>
       ) : (
         <ul className="flex flex-col gap-3">
@@ -157,14 +157,14 @@ export function AppointmentsBoard({
                 <div className="p-4">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <h3 className="font-sans text-base font-semibold text-noir-900">
+                      <h3 className="text-base text-noir-900">
                         {a.customerName}
                       </h3>
                       <p className="text-sm text-gold-dark">{a.serviceName}</p>
                     </div>
                     <span
                       className={[
-                        "flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium",
+                        "flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-xs font-sans font-normal",
                         meta.className,
                       ].join(" ")}
                     >
@@ -178,7 +178,7 @@ export function AppointmentsBoard({
                       <Clock className="h-4 w-4 text-gold" />
                       {formatDateHebrew(a.date)} · {a.startTime}
                     </span>
-                    <span className="tabular font-medium text-noir-900">
+                    <span className="tabular text-noir-900">
                       {a.price} ₪
                     </span>
                   </div>
@@ -237,7 +237,7 @@ export function AppointmentsBoard({
                       <button
                         onClick={() => updateStatus(a.id, "confirmed")}
                         disabled={busy}
-                        className="flex flex-1 items-center justify-center gap-1.5 py-3 text-sm font-semibold text-emerald-700 transition-colors hover:bg-emerald-50 disabled:opacity-50"
+                        className="flex flex-1 items-center justify-center gap-1.5 py-3 text-sm font-bold text-emerald-700 transition-colors hover:bg-emerald-50 disabled:opacity-50"
                       >
                         {busy ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
@@ -250,7 +250,7 @@ export function AppointmentsBoard({
                     <button
                       onClick={() => updateStatus(a.id, "cancelled")}
                       disabled={busy}
-                      className="flex flex-1 items-center justify-center gap-1.5 border-r border-neutral-200 py-3 text-sm font-semibold text-neutral-600 transition-colors hover:bg-rose-50 hover:text-rose-600 disabled:opacity-50"
+                      className="flex flex-1 items-center justify-center gap-1.5 border-r border-neutral-200 py-3 text-sm font-bold text-neutral-600 transition-colors hover:bg-rose-50 hover:text-rose-600 disabled:opacity-50"
                     >
                       <X className="h-4 w-4" />
                       ביטול תור
