@@ -29,7 +29,8 @@ export interface AvailabilityResult {
 // מחשב את כל השעות הפנויות לתאריך נתון עבור שירות מסוים (לפי משך השירות)
 export async function getAvailableSlots(
   dateStr: string,
-  durationMin: number
+  durationMin: number,
+  excludeAppointmentId?: string
 ): Promise<AvailabilityResult> {
   if (isPastDate(dateStr)) {
     return { date: dateStr, open: false, reason: "תאריך שעבר", slots: [] };
@@ -62,7 +63,11 @@ export async function getAvailableSlots(
 
   // תורים קיימים (לא מבוטלים) ביום זה
   const appointments = await prisma.appointment.findMany({
-    where: { date: dateStr, status: { not: "cancelled" } },
+    where: {
+      date: dateStr,
+      status: { not: "cancelled" },
+      ...(excludeAppointmentId ? { id: { not: excludeAppointmentId } } : {}),
+    },
     select: { startTime: true, durationMin: true },
   });
 
@@ -98,10 +103,76 @@ export async function getAvailableSlots(
 export async function isSlotAvailable(
   dateStr: string,
   startTime: string,
-  durationMin: number
+  durationMin: number,
+  excludeAppointmentId?: string
 ): Promise<boolean> {
-  const result = await getAvailableSlots(dateStr, durationMin);
+  const result = await getAvailableSlots(
+    dateStr,
+    durationMin,
+    excludeAppointmentId
+  );
   return result.open && result.slots.includes(startTime);
+}
+
+/** בדיקת חפיפה לשעות חופשיות — גם שעה שלא על רשת הסלוטים (למנהל) */
+export async function canBookAt(
+  dateStr: string,
+  startTime: string,
+  durationMin: number,
+  excludeAppointmentId?: string
+): Promise<{ ok: true } | { ok: false; reason: string }> {
+  if (!/^\d{2}:\d{2}$/.test(startTime)) {
+    return { ok: false, reason: "שעה לא תקינה" };
+  }
+  if (isPastDate(dateStr)) {
+    return { ok: false, reason: "תאריך שעבר" };
+  }
+
+  const blocked = await prisma.blockedDate.findUnique({
+    where: { date: dateStr },
+  });
+  if (blocked) {
+    return { ok: false, reason: blocked.reason || "יום סגור" };
+  }
+
+  const workingHours = await prisma.workingHours.findUnique({
+    where: { dayOfWeek: getDayOfWeek(dateStr) },
+  });
+  if (!workingHours || !workingHours.isOpen) {
+    return { ok: false, reason: "סגור ביום זה" };
+  }
+
+  const start = timeToMinutes(startTime);
+  const end = start + durationMin;
+  const dayStart = timeToMinutes(workingHours.startTime);
+  const dayEnd = timeToMinutes(workingHours.endTime);
+  if (!Number.isFinite(start) || start < dayStart || end > dayEnd) {
+    return { ok: false, reason: "השעה מחוץ לשעות הפעילות" };
+  }
+
+  if (isToday(dateStr) && start <= getNowMinutesInAppTimezone() + 30) {
+    return { ok: false, reason: "השעה כבר עברה או קרובה מדי" };
+  }
+
+  const appointments = await prisma.appointment.findMany({
+    where: {
+      date: dateStr,
+      status: { not: "cancelled" },
+      ...(excludeAppointmentId ? { id: { not: excludeAppointmentId } } : {}),
+    },
+    select: { startTime: true, durationMin: true },
+  });
+
+  const overlaps = appointments.some((a) => {
+    const bStart = timeToMinutes(a.startTime);
+    const bEnd = bStart + a.durationMin;
+    return start < bEnd && bStart < end;
+  });
+  if (overlaps) {
+    return { ok: false, reason: "השעה שנבחרה כבר נתפסה. אנא בחרו שעה אחרת." };
+  }
+
+  return { ok: true };
 }
 
 // מחזיר אילו ימים בחודש פתוחים לקביעת תורים (לסימון ביומן)

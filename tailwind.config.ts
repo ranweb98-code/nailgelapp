@@ -75,6 +75,10 @@ const config: Config = {
           "0%": { opacity: "0", transform: "scale(0.95)" },
           "100%": { opacity: "1", transform: "scale(1)" },
         },
+        "sheet-up": {
+          "0%": { opacity: "0", transform: "translateY(28px) scale(0.98)" },
+          "100%": { opacity: "1", transform: "translateY(0) scale(1)" },
+        },
         shimmer: {
           "0%": { backgroundPosition: "200% 0" },
           "100%": { backgroundPosition: "-200% 0" },
@@ -84,6 +88,7 @@ const config: Config = {
         "fade-up": "fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both",
         "fade-in": "fade-in 0.5s ease-out both",
         "scale-in": "scale-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both",
+        "sheet-up": "sheet-up 0.42s cubic-bezier(0.16, 1, 0.3, 1) both",
         shimmer: "shimmer 2.5s linear infinite",
       },
     },

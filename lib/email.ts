@@ -174,3 +174,21 @@ export async function sendCustomerReminder(
     html: layout("תזכורת לתור", body),
   });
 }
+
+export async function sendCustomerRescheduled(
+  data: AppointmentEmailData & { oldDate: string; oldStartTime: string }
+): Promise<boolean> {
+  if (!data.email?.trim()) return true;
+  const body = `
+    <p style="color:#2B2622; font-size:16px; margin-top:0;">היי ${data.customerName}, התור שלך הועבר למועד חדש.</p>
+    <p style="color:#6B635C; font-size:14px; margin:0 0 16px;">המועד הקודם: ${formatDateHebrew(data.oldDate)} בשעה ${data.oldStartTime}</p>
+    ${detailsTable(data)}
+    <p style="color:#6B635C; font-size:14px; margin-top:18px;">אם המועד לא מתאים, ניתן ליצור קשר בטלפון.</p>
+    <p style="color:#B76E79; font-weight:600; margin-bottom:0;">נתראה 💅</p>
+  `;
+  return send({
+    to: data.email,
+    subject: `התור הוזז · ${formatDateHebrew(data.date)} בשעה ${data.startTime}`,
+    html: layout("התור הועבר", body),
+  });
+}

@@ -172,6 +172,36 @@ export async function notifyAppointmentStatus(data: {
   });
 }
 
+export async function notifyCustomerBookedByAdmin(data: {
+  phone: string;
+  email: string;
+  serviceName: string;
+  date: string;
+  startTime: string;
+}): Promise<void> {
+  await sendPushToCustomer(data.phone, data.email, {
+    title: "נקבע לך תור",
+    body: `${data.serviceName} · ${data.date} בשעה ${data.startTime}`,
+    url: "/",
+    tag: "booking-confirmation",
+  });
+}
+
+export async function notifyAppointmentRescheduled(data: {
+  phone: string;
+  email: string;
+  serviceName: string;
+  date: string;
+  startTime: string;
+}): Promise<void> {
+  await sendPushToCustomer(data.phone, data.email, {
+    title: "התור הוזז",
+    body: `${data.serviceName} · ${data.date} בשעה ${data.startTime}`,
+    url: "/",
+    tag: "appt-rescheduled",
+  });
+}
+
 export async function notifyCustomerReminder(data: {
   phone: string;
   email: string;

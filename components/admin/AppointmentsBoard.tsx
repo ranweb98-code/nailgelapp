@@ -12,8 +12,15 @@ import {
   Loader2,
   CircleDot,
   Heart,
+  Plus,
+  CalendarClock,
 } from "lucide-react";
 import { formatDateHebrew } from "@/lib/time";
+import {
+  AdminAppointmentSheet,
+  type AdminServiceLite,
+  type RescheduleTarget,
+} from "@/components/admin/AdminAppointmentSheet";
 
 interface Appointment {
   id: string;
@@ -51,13 +58,20 @@ const STATUS_META: Record<string, { label: string; className: string }> = {
 export function AppointmentsBoard({
   appointments,
   today,
+  services,
+  openDaysOfWeek,
+  blockedDates,
 }: {
   appointments: Appointment[];
   today: string;
+  services: AdminServiceLite[];
+  openDaysOfWeek: number[];
+  blockedDates: string[];
 }) {
   const router = useRouter();
-  const [tab, setTab] = useState<Tab>("pending");
+  const [tab, setTab] = useState<Tab>("upcoming");
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [sheet, setSheet] = useState<"create" | RescheduleTarget | null>(null);
 
   const counts = useMemo(
     () => ({
@@ -102,7 +116,14 @@ export function AppointmentsBoard({
   };
 
   return (
-    <div>
+    <div className="pb-24">
+      <div className="mb-4">
+        <h2 className="text-lg text-noir-900">תורים</h2>
+        <p className="text-sm font-normal text-neutral-500">
+          קביעת תור חדש או הזזה לשעה אחרת אחרי שיחה עם הלקוח
+        </p>
+      </div>
+
       {/* Tabs */}
       <div className="no-scrollbar mb-4 flex gap-1.5 overflow-x-auto pb-1">
         {TABS.map((t) => {
@@ -146,14 +167,26 @@ export function AppointmentsBoard({
             <CalendarX className="h-7 w-7 text-neutral-400" />
           </div>
           <p className="text-base text-neutral-600">אין תורים להצגה כאן</p>
+          <button
+            type="button"
+            onClick={() => setSheet("create")}
+            className="btn-primary mt-1 px-5 py-3 text-base"
+          >
+            <Plus className="h-4 w-4" />
+            קביעת תור חדש
+          </button>
         </div>
       ) : (
         <ul className="flex flex-col gap-3">
-          {filtered.map((a) => {
+          {filtered.map((a, i) => {
             const meta = STATUS_META[a.status] || STATUS_META.pending;
             const busy = busyId === a.id;
-            return (
-              <li key={a.id} className="glass overflow-hidden rounded-3xl">
+          return (
+            <li
+              key={a.id}
+              className="glass animate-fade-up overflow-hidden rounded-3xl"
+              style={{ animationDelay: `${Math.min(i, 12) * 40}ms` }}
+            >
                 <div className="p-4">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
@@ -232,29 +265,50 @@ export function AppointmentsBoard({
                 </div>
 
                 {a.status !== "cancelled" && (
-                  <div className="flex border-t border-neutral-200">
-                    {a.status === "pending" && (
-                      <button
-                        onClick={() => updateStatus(a.id, "confirmed")}
-                        disabled={busy}
-                        className="flex flex-1 items-center justify-center gap-1.5 py-3 text-sm font-bold text-emerald-700 transition-colors hover:bg-emerald-50 disabled:opacity-50"
-                      >
-                        {busy ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Check className="h-4 w-4" />
-                        )}
-                        אישור
-                      </button>
-                    )}
+                  <div className="border-t border-neutral-200">
                     <button
-                      onClick={() => updateStatus(a.id, "cancelled")}
+                      type="button"
+                      onClick={() =>
+                        setSheet({
+                          id: a.id,
+                          customerName: a.customerName,
+                          phone: a.phone,
+                          serviceName: a.serviceName,
+                          durationMin: a.durationMin,
+                          date: a.date,
+                          startTime: a.startTime,
+                        })
+                      }
                       disabled={busy}
-                      className="flex flex-1 items-center justify-center gap-1.5 border-r border-neutral-200 py-3 text-sm font-bold text-neutral-600 transition-colors hover:bg-rose-50 hover:text-rose-600 disabled:opacity-50"
+                      className="flex w-full items-center justify-center gap-2 bg-gold/15 py-3 text-sm font-bold text-gold-dark transition-colors hover:bg-gold/25 disabled:opacity-50"
                     >
-                      <X className="h-4 w-4" />
-                      ביטול תור
+                      <CalendarClock className="h-4 w-4" />
+                      הזזת תור לשעה אחרת
                     </button>
+                    <div className="flex border-t border-neutral-200">
+                      {a.status === "pending" && (
+                        <button
+                          onClick={() => updateStatus(a.id, "confirmed")}
+                          disabled={busy}
+                          className="flex flex-1 items-center justify-center gap-1.5 py-3 text-sm font-bold text-emerald-700 transition-colors hover:bg-emerald-50 disabled:opacity-50"
+                        >
+                          {busy ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Check className="h-4 w-4" />
+                          )}
+                          אישור
+                        </button>
+                      )}
+                      <button
+                        onClick={() => updateStatus(a.id, "cancelled")}
+                        disabled={busy}
+                        className="flex flex-1 items-center justify-center gap-1.5 py-3 text-sm font-bold text-neutral-600 transition-colors hover:bg-rose-50 hover:text-rose-600 disabled:opacity-50"
+                      >
+                        <X className="h-4 w-4" />
+                        ביטול תור
+                      </button>
+                    </div>
                   </div>
                 )}
               </li>
@@ -262,6 +316,31 @@ export function AppointmentsBoard({
           })}
         </ul>
       )}
+
+      {sheet && (
+        <AdminAppointmentSheet
+          mode={sheet === "create" ? "create" : "move"}
+          services={services}
+          openDaysOfWeek={openDaysOfWeek}
+          blockedDates={blockedDates}
+          reschedule={sheet === "create" ? null : sheet}
+          onClose={() => setSheet(null)}
+          onSaved={() => {
+            setSheet(null);
+            router.refresh();
+          }}
+        />
+      )}
+
+      <button
+        type="button"
+        onClick={() => setSheet("create")}
+        disabled={services.length === 0}
+        className="btn-primary fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-1/2 z-[60] w-[min(calc(100%-2.5rem),28rem)] -translate-x-1/2 shadow-float disabled:opacity-40"
+      >
+        <Plus className="h-5 w-5" />
+        קביעת תור חדש
+      </button>
     </div>
   );
 }

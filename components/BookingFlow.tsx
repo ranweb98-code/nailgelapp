@@ -19,6 +19,7 @@ import { Calendar } from "@/components/Calendar";
 import { InspoGallery } from "@/components/InspoGallery";
 import { formatDateHebrew } from "@/lib/time";
 import { type InspoImageLite } from "@/lib/inspoTags";
+import { isValidIsraeliPhone } from "@/lib/phone";
 
 export interface ServiceLite {
   id: string;
@@ -186,7 +187,7 @@ export function BookingFlow({
 
   const validDetails =
     form.customerName.trim().length >= 2 &&
-    /^0\d{1,2}-?\d{7}$/.test(form.phone.trim()) &&
+    isValidIsraeliPhone(form.phone) &&
     (form.email.trim() === "" ||
       /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim()));
 
@@ -244,7 +245,7 @@ export function BookingFlow({
       <div className="container-app pt-5">
         {/* ----- שלב 1: בחירת שירות ----- */}
         {step === "service" && (
-          <div className="services-panel animate-fade-up">
+          <div key="service" className="services-panel animate-fade-up">
             <h2 className="mb-1 text-2xl text-noir-900">איזה טיפול תרצו?</h2>
             <p className="mb-5 font-sans text-sm text-neutral-600">בחרו שירות כדי להמשיך</p>
             <ul className="flex flex-col gap-3">
@@ -284,7 +285,7 @@ export function BookingFlow({
 
         {/* ----- שלב 2: תאריך ושעה ----- */}
         {step === "datetime" && service && (
-          <div className="animate-fade-up">
+          <div key="datetime" className="animate-fade-up">
             <button
               type="button"
               onClick={() => setStep("service")}
@@ -330,13 +331,14 @@ export function BookingFlow({
 
                 {!slotsLoading && slots.length > 0 && (
                   <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-                    {slots.map((slot) => (
+                    {slots.map((slot, i) => (
                       <button
                         key={slot}
                         type="button"
                         onClick={() => setTime(slot)}
+                        style={{ animationDelay: `${i * 20}ms` }}
                         className={[
-                          "tabular rounded-xl border py-3 text-sm font-medium transition-all duration-150 active:scale-95",
+                          "tabular animate-fade-up rounded-xl border py-3 text-sm font-medium transition-all duration-150 active:scale-95",
                           time === slot
                             ? "border-gold bg-gold text-noir-900 shadow-glow"
                             : "border-neutral-200 bg-neutral-50 text-noir-900 hover:border-gold/40",
@@ -354,7 +356,7 @@ export function BookingFlow({
 
         {/* ----- שלב 3: השראה ----- */}
         {step === "inspo" && (
-          <div className="animate-fade-up">
+          <div key="inspo" className="animate-fade-up">
             <h2 className="mb-1 flex items-center gap-2 text-2xl text-noir-900">
               <Heart className="h-6 w-6 text-gold" />
               הוסיפו השראה
@@ -377,7 +379,7 @@ export function BookingFlow({
 
         {/* ----- שלב 4: פרטים ----- */}
         {step === "details" && service && date && time && (
-          <div className="animate-fade-up">
+          <div key="details" className="animate-fade-up">
             <h2 className="mb-4 text-2xl text-noir-900">הפרטים שלכם</h2>
 
             <div className="glass-light mb-4 overflow-hidden rounded-3xl">

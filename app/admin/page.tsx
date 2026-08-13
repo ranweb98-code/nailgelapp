@@ -14,12 +14,28 @@ export default async function AdminDashboardPage() {
 
   await runCleanup().catch(() => {});
 
-  const [appointments, inspoImages] = await Promise.all([
+  const today = toDateString(new Date());
+
+  const [appointments, inspoImages, services, workingHours, blocked] =
+    await Promise.all([
     prisma.appointment.findMany({
       orderBy: [{ date: "asc" }, { startTime: "asc" }],
       take: 300,
     }),
     prisma.inspoImage.findMany({ select: { id: true, src: true } }),
+    prisma.service.findMany({
+      where: { active: true },
+      orderBy: { order: "asc" },
+      select: { id: true, name: true, durationMin: true, price: true },
+    }),
+    prisma.workingHours.findMany({
+      where: { isOpen: true },
+      select: { dayOfWeek: true },
+    }),
+    prisma.blockedDate.findMany({
+      where: { date: { gte: today } },
+      select: { date: true },
+    }),
   ]);
 
   const inspoMap = new Map(inspoImages.map((i) => [i.id, i.src]));
@@ -48,7 +64,10 @@ export default async function AdminDashboardPage() {
       <div className="container-app pt-4">
         <AppointmentsBoard
           appointments={data}
-          today={toDateString(new Date())}
+          today={today}
+          services={services}
+          openDaysOfWeek={workingHours.map((h) => h.dayOfWeek)}
+          blockedDates={blocked.map((b) => b.date)}
         />
       </div>
     </main>

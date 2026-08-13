@@ -1,18 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { isSlotAvailable } from "@/lib/availability";
+import { isAuthenticated } from "@/lib/auth";
+import { canBookAt } from "@/lib/availability";
 import { tryNormalizeIsraeliPhone } from "@/lib/phone";
 import {
   sendCustomerConfirmation,
-  sendOwnerNewAppointment,
   type AppointmentEmailData,
 } from "@/lib/email";
-import { notifyNewAppointment } from "@/lib/push";
+import { notifyCustomerBookedByAdmin } from "@/lib/push";
 
 export const dynamic = "force-dynamic";
 
-const bookingSchema = z.object({
+const schema = z.object({
   serviceId: z.string().min(1, "יש לבחור שירות"),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "תאריך לא תקין"),
   startTime: z.string().regex(/^\d{2}:\d{2}$/, "שעה לא תקינה"),
@@ -35,12 +35,13 @@ const bookingSchema = z.object({
     .optional()
     .or(z.literal("")),
   notes: z.string().trim().max(500).optional(),
-  inspoIds: z.array(z.string()).max(20).optional(),
-  /** endpoint של מנוי Push במכשיר הנוכחי — לקישור מיידי לפני שליחת התראה */
-  pushEndpoint: z.string().url().optional(),
 });
 
 export async function POST(req: NextRequest) {
+  if (!(await isAuthenticated())) {
+    return NextResponse.json({ error: "לא מורשה" }, { status: 401 });
+  }
+
   let body: unknown;
   try {
     body = await req.json();
@@ -48,7 +49,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "גוף בקשה לא תקין" }, { status: 400 });
   }
 
-  const parsed = bookingSchema.safeParse(body);
+  const parsed = schema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
       { error: parsed.error.issues[0]?.message || "נתונים לא תקינים" },
@@ -65,31 +66,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "השירות אינו זמין" }, { status: 404 });
   }
 
-  // בדיקה שהסלוט עדיין פנוי (מניעת קביעה כפולה)
-  const available = await isSlotAvailable(
+  const bookable = await canBookAt(
     data.date,
     data.startTime,
     service.durationMin
   );
-  if (!available) {
-    return NextResponse.json(
-      { error: "השעה שנבחרה כבר נתפסה. אנא בחרו שעה אחרת." },
-      { status: 409 }
-    );
-  }
-
-  // אימות תמונות ההשראה שנבחרו
-  let inspoImages: { src: string; label: string | null }[] = [];
-  let inspoIdsCsv: string | null = null;
-  if (data.inspoIds && data.inspoIds.length > 0) {
-    const found = await prisma.inspoImage.findMany({
-      where: { id: { in: data.inspoIds }, active: true },
-      select: { id: true, src: true, label: true },
-    });
-    if (found.length > 0) {
-      inspoIdsCsv = found.map((f) => f.id).join(",");
-      inspoImages = found.map((f) => ({ src: f.src, label: f.label }));
-    }
+  if (!bookable.ok) {
+    return NextResponse.json({ error: bookable.reason }, { status: 409 });
   }
 
   const email = data.email?.trim() ? data.email.trim().toLowerCase() : null;
@@ -106,24 +89,9 @@ export async function POST(req: NextRequest) {
       phone: data.phone,
       email,
       notes: data.notes,
-      inspoIds: inspoIdsCsv,
-      status: "pending",
+      status: "confirmed",
     },
   });
-
-  // מקשרים את מנוי ה-Push של המכשיר לפרטי הלקוחה לפני שליחת ההתראה
-  if (data.pushEndpoint) {
-    await prisma.pushSubscription
-      .updateMany({
-        where: { endpoint: data.pushEndpoint },
-        data: {
-          phone: data.phone,
-          email,
-          role: "customer",
-        },
-      })
-      .catch(() => {});
-  }
 
   const emailData: AppointmentEmailData = {
     customerName: appointment.customerName,
@@ -134,17 +102,13 @@ export async function POST(req: NextRequest) {
     startTime: appointment.startTime,
     price: appointment.price,
     notes: appointment.notes,
-    inspoImages,
   };
 
-  // אימיילים + Push למי שהתקין את האפליקציה
   await Promise.allSettled([
-    sendOwnerNewAppointment(emailData),
     appointment.email
       ? sendCustomerConfirmation(emailData)
       : Promise.resolve(true),
-    notifyNewAppointment({
-      customerName: appointment.customerName,
+    notifyCustomerBookedByAdmin({
       phone: appointment.phone,
       email: appointment.email || "",
       serviceName: appointment.serviceName,
@@ -160,6 +124,7 @@ export async function POST(req: NextRequest) {
       date: appointment.date,
       startTime: appointment.startTime,
       price: appointment.price,
+      status: appointment.status,
     },
     { status: 201 }
   );

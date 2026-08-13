@@ -51,13 +51,13 @@ export default async function HomePage() {
 
         <div className="absolute inset-x-0 bottom-0 z-[3] px-6 pb-6">
           <div className="container-app px-0">
-            <p className="mb-2 text-xs uppercase tracking-[0.4em] text-gold-light">
+            <p className="mb-2 animate-fade-up text-xs uppercase tracking-[0.4em] text-gold-light">
               {settings.businessTagline}
             </p>
-            <h1 className="hero-brand font-display text-[2.65rem] font-normal italic leading-[0.9] tracking-[0.02em] text-cream sm:text-6xl">
+            <h1 className="hero-brand animate-fade-up font-display text-[2.65rem] font-normal italic leading-[0.9] tracking-[0.02em] text-cream [animation-delay:80ms] sm:text-6xl">
               {settings.businessName}
             </h1>
-            <p className="mt-3 max-w-xs text-balance text-sm leading-relaxed text-cream-soft">
+            <p className="mt-3 max-w-xs animate-fade-up text-balance text-sm leading-relaxed text-cream-soft [animation-delay:140ms]">
               לק ג'ל, בנייה ומניקור בעבודת יד מוקפדת. קבעו תור בכמה הקשות.
             </p>
           </div>
@@ -66,7 +66,7 @@ export default async function HomePage() {
 
       {/* CTA — נכנס מתחת לקשת ההירו */}
       <section className="container-app relative z-[2] mt-5">
-        <Link href="/book" className="btn-primary w-full">
+        <Link href="/book" className="btn-primary w-full animate-fade-up [animation-delay:80ms]">
           <Calendar className="h-5 w-5" />
           קביעת תור
         </Link>
