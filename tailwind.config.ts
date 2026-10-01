@@ -46,10 +46,9 @@ const config: Config = {
         },
       },
       fontFamily: {
-        serif: ["var(--font-serif)", "Georgia", "serif"],
-        display: ["var(--font-display)", "var(--font-serif)", "serif"],
-        yad: ["var(--font-yad)", "var(--font-serif)", "serif"],
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        display: ["var(--font-sans)", "system-ui", "sans-serif"],
+        serif: ["var(--font-sans)", "system-ui", "sans-serif"],
       },
       boxShadow: {
         glass: "0 8px 32px rgba(17, 12, 13, 0.32)",

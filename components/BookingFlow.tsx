@@ -14,12 +14,27 @@ import {
   Heart,
   Home,
   CalendarCheck,
+  Hand,
+  Footprints,
+  Gem,
+  Layers,
+  Eraser,
+  type LucideIcon,
 } from "lucide-react";
 import { Calendar } from "@/components/Calendar";
 import { InspoGallery } from "@/components/InspoGallery";
 import { formatDateHebrew } from "@/lib/time";
 import { type InspoImageLite } from "@/lib/inspoTags";
 import { isValidIsraeliPhone } from "@/lib/phone";
+
+const SERVICE_ICONS: LucideIcon[] = [
+  Hand,
+  Footprints,
+  Gem,
+  Layers,
+  Sparkles,
+  Eraser,
+];
 
 export interface ServiceLite {
   id: string;
@@ -245,19 +260,24 @@ export function BookingFlow({
       <div className="container-app pt-5">
         {/* ----- שלב 1: בחירת שירות ----- */}
         {step === "service" && (
-          <div key="service" className="services-panel animate-fade-up">
+          <div key="service" className="services-panel animate-fade-up rounded-3xl border border-blush-border bg-gold/10 p-5">
             <h2 className="mb-1 text-2xl text-noir-900">איזה טיפול תרצו?</h2>
             <p className="mb-5 font-sans text-sm text-neutral-600">בחרו שירות כדי להמשיך</p>
             <ul className="flex flex-col gap-3">
-              {services.map((s) => (
+              {services.map((s, i) => {
+                const Icon = SERVICE_ICONS[i % SERVICE_ICONS.length];
+                return (
                 <li key={s.id}>
                   <button
                     type="button"
                     onClick={() => selectService(s)}
-                    className="service-row glass flex w-full items-center gap-4 rounded-2xl p-4 text-right"
+                    className="service-row flex w-full items-center gap-4 rounded-2xl border border-blush-border bg-white p-4 text-right"
                   >
+                    <div className="service-row__icon flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-noir-800 text-cream">
+                      <Icon className="h-5 w-5" strokeWidth={1.75} />
+                    </div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="font-yad text-xl font-bold leading-tight tracking-wide text-noir-900">
+                      <h3 className="font-sans text-lg font-bold leading-snug tracking-tight text-noir-900">
                         {s.name}
                       </h3>
                       {s.description && (
@@ -278,7 +298,8 @@ export function BookingFlow({
                     <ChevronRight className="h-5 w-5 shrink-0 rotate-180 text-neutral-400" />
                   </button>
                 </li>
-              ))}
+              );
+              })}
             </ul>
           </div>
         )}

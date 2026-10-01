@@ -35,13 +35,13 @@ export function ServiceCard({
   return (
     <Link
       href={`/book?service=${id}`}
-      className="service-row flex items-center gap-4 rounded-2xl border border-blush-border bg-blush-muted p-4"
+      className="service-row flex items-center gap-4 rounded-2xl border border-blush-border bg-white p-4"
     >
-      <div className="service-row__icon flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-neutral-200 bg-gold/10 text-gold-dark">
+      <div className="service-row__icon flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-noir-800 text-cream">
         <Icon className="h-5 w-5" strokeWidth={1.75} />
       </div>
       <div className="min-w-0 flex-1">
-        <h3 className="font-yad text-xl font-bold leading-tight tracking-wide text-noir-900">
+        <h3 className="font-sans text-lg font-bold leading-snug tracking-tight text-noir-900">
           {name}
         </h3>
         {description && (

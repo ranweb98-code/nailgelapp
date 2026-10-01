@@ -49,15 +49,12 @@ export default async function HomePage() {
         />
         <div className="hero-scrim hero-edge-media absolute inset-x-0 bottom-0" aria-hidden />
 
-        <div className="absolute inset-x-0 bottom-0 z-[3] px-6 pb-6">
-          <div className="container-app px-0">
-            <p className="mb-2 animate-fade-up text-xs uppercase tracking-[0.4em] text-gold-light">
-              {settings.businessTagline}
-            </p>
-            <h1 className="hero-brand animate-fade-up font-display text-[2.65rem] font-normal italic leading-[0.9] tracking-[0.02em] text-cream [animation-delay:80ms] sm:text-6xl">
-              {settings.businessName}
-            </h1>
-            <p className="mt-3 max-w-xs animate-fade-up text-balance text-sm leading-relaxed text-cream-soft [animation-delay:140ms]">
+        <div className="absolute inset-x-0 bottom-0 z-[3] px-5 pb-6">
+          <p className="mb-2 w-full animate-fade-up whitespace-nowrap text-center text-sm uppercase tracking-[0.85em] text-gold-light">
+            {settings.businessTagline}
+          </p>
+          <div className="container-app flex flex-col items-center px-0 text-center">
+            <p className="mt-3 max-w-xs animate-fade-up text-balance text-sm leading-relaxed text-cream-soft [animation-delay:80ms]">
               לק ג'ל, בנייה ומניקור בעבודת יד מוקפדת. קבעו תור בכמה הקשות.
             </p>
           </div>
@@ -74,7 +71,7 @@ export default async function HomePage() {
 
       {/* Services */}
       <section className="container-app mt-6">
-        <div className="services-panel glass rounded-3xl p-5">
+        <div className="services-panel rounded-3xl border border-blush-border bg-gold/10 p-5">
           <ul className="flex flex-col gap-3">
             {services.map((s, i) => (
               <li

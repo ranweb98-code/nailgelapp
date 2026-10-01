@@ -33,7 +33,7 @@
   h1,
   h2,
   h3 {
-    @apply font-yad font-bold tracking-wide;
+    @apply font-sans font-bold tracking-tight;
   }
 
   .tabular {
@@ -65,7 +65,7 @@
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-rose-200 px-6 py-4 font-yad text-xl font-bold tracking-wide text-noir-900 shadow-float transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100;
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-rose-200 px-6 py-4 font-sans text-base font-semibold tracking-normal text-noir-900 shadow-float transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100;
   }
   [data-theme="dark"] .btn-primary {
     @apply bg-gold text-noir-900 shadow-glow;
@@ -149,12 +149,9 @@
       );
   }
 
-  .hero-brand {
-    text-shadow: 0 2px 28px rgba(0, 0, 0, 0.45);
-  }
-
   .services-panel .tabular.font-semibold {
-    @apply font-yad text-lg font-bold tracking-wide text-gold-dark;
+    @apply font-sans text-sm tracking-normal text-gold-dark;
+    font-weight: 600;
   }
 
   /* כרטיס שירות: hover דביק רק במגע — מופיע רק עם עכבר; בטלפון משוב קצר בלחיצה */
@@ -168,7 +165,7 @@
     @apply transition-colors duration-150;
   }
   .service-row:active .service-row__icon {
-    @apply bg-gold/30 text-noir-900;
+    @apply bg-noir-700 text-cream;
   }
   .service-row__chevron {
     @apply transition-[transform,color] duration-150;
@@ -178,7 +175,7 @@
       @apply border-gold/40 bg-blush-card;
     }
     .service-row:hover .service-row__icon {
-      @apply bg-gold text-noir-900;
+      @apply bg-noir-700 text-gold-light;
     }
     .service-row:hover .service-row__chevron {
       @apply -translate-x-0.5 text-gold-dark;
@@ -194,7 +191,7 @@
   }
 
   .admin-theme {
-    @apply bg-white font-yad text-base font-bold tracking-wide text-noir-900;
+    @apply bg-white font-sans text-base font-medium tracking-normal text-noir-900;
   }
   .admin-theme input,
   .admin-theme textarea,
@@ -344,10 +341,3 @@
   @apply border-neutral-600 bg-noir-800 text-cream;
 }
 
-@layer utilities {
-  .font-yad {
-    font-synthesis: weight;
-    -webkit-text-stroke: 0.32px currentColor;
-    paint-order: stroke fill;
-  }
-}

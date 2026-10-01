@@ -80,7 +80,7 @@ export function Calendar({
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
-        <div className="text-center font-serif text-lg font-medium text-noir-900">
+        <div className="text-center font-sans text-lg font-bold text-noir-900">
           {HEBREW_MONTHS[viewMonth]} {viewYear}
         </div>
         <button
