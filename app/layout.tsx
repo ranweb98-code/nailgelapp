@@ -61,11 +61,16 @@ export default async function RootLayout({
     document.head.appendChild(m);
   }
   var pwa=window.navigator.standalone===true||(window.matchMedia&&(matchMedia("(display-mode: standalone)").matches||matchMedia("(display-mode: fullscreen)").matches));
-  if(pwa){
-    r.classList.add("is-pwa");
-    r.style.removeProperty("--hero-sat");
-    r.style.colorScheme="light";
-    document.querySelectorAll('meta[name="theme-color"]').forEach(function(el){el.remove();});
+  if(!pwa) return;
+  r.classList.add("is-pwa");
+  r.style.setProperty("--hero-sat","0px");
+  document.querySelectorAll('meta[name="theme-color"]').forEach(function(el){el.remove();});
+  if(location.pathname==="/"||location.pathname===""){
+    r.style.colorScheme="dark";
+    var t=document.createElement("meta");
+    t.name="theme-color";
+    t.content="transparent";
+    document.head.appendChild(t);
   }
 })();`}
         </Script>

@@ -128,8 +128,8 @@
   }
 
   .hero-edge {
-    height: 72dvh;
-    min-height: 480px;
+    height: calc(72dvh + env(safe-area-inset-top, 0px));
+    min-height: calc(480px + env(safe-area-inset-top, 0px));
     margin-top: 0;
     padding-top: 0;
   }
@@ -345,7 +345,10 @@
   @apply border-neutral-600 bg-noir-800 text-cream;
 }
 
-/* אל תגזירו overflow על html/body — זה חותך מדיה full-bleed. אל תצבעו status bar אטום. */
+/* overflow על html/body חותך הירו full-bleed. color-scheme:light ב-PWA מצייר פס סטטוס לבן. */
+html {
+  background-color: #110c0d;
+}
 html,
 body {
   overflow-x: visible !important;
@@ -356,12 +359,12 @@ body {
 }
 html.is-pwa {
   --hero-sat: 0px;
-  color-scheme: light;
+  color-scheme: dark;
 }
 @media (display-mode: standalone), (display-mode: fullscreen) {
   :root {
     --hero-sat: 0px;
-    color-scheme: light;
+    color-scheme: dark;
   }
 }
 

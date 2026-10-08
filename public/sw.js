@@ -1,5 +1,5 @@
 // Service Worker — caching + Web Push notifications
-const CACHE = "gel-studio-v6";
+const CACHE = "gel-studio-v7";
 const APP_SHELL = ["/", "/offline"];
 
 self.addEventListener("install", (event) => {
