@@ -345,26 +345,34 @@
   @apply border-neutral-600 bg-noir-800 text-cream;
 }
 
-/* overflow על html/body חותך הירו full-bleed. color-scheme:light ב-PWA מצייר פס סטטוס לבן. */
+/* overflow על html/body חותך הירו full-bleed — חייב להישאר visible. */
 html {
-  background-color: #110c0d;
+  background-color: var(--status-tint, #110c0d);
 }
 html,
 body {
   overflow-x: visible !important;
   overflow-y: visible !important;
 }
-:root {
-  --hero-sat: 0px;
+
+/* iOS 27: הצבע של הפס העליון נגזר מאלמנט fixed קרוב לקצה העליון (>=6px, >=80% רוחב, עד 4px מהקצה).
+   background-clip:text בלי טקסט => הצבע נקרא ע"י המערכת אבל לא מצויר מעל הסרטון. */
+.status-tint {
+  display: none;
 }
-html.is-pwa {
-  --hero-sat: 0px;
-  color-scheme: dark;
-}
-@media (display-mode: standalone), (display-mode: fullscreen) {
-  :root {
-    --hero-sat: 0px;
-    color-scheme: dark;
+@media (display-mode: standalone) {
+  .status-tint {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: max(env(safe-area-inset-top, 0px), 11px);
+    pointer-events: none;
+    z-index: 5;
+    background-color: var(--status-tint, #110c0d);
+    -webkit-background-clip: text;
+    background-clip: text;
   }
 }
 
