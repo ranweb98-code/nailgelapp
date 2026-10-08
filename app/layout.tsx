@@ -24,17 +24,18 @@ export const metadata: Metadata = {
     icon: "/icons/icon-192.png",
     apple: "/icons/apple-touch-icon.png",
   },
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
 };
 
-export async function generateViewport(): Promise<Viewport> {
-  return {
-    themeColor: "#110C0D",
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 5,
-    viewportFit: "cover",
-  };
-}
+export const viewport: Viewport = {
+  themeColor: "#110C0D",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: "cover",
+};
 
 export default async function RootLayout({
   children,

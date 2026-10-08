@@ -36,7 +36,7 @@ export default async function HomePage() {
   return (
     <main className="page-bg min-h-dvh pb-28">
       {/* Hero - וידאו + שם בסריף + קצה עגול */}
-      <section className="hero-curve hero-edge relative z-[1] h-[72vh] min-h-[480px] w-full overflow-hidden bg-noir-900">
+      <section className="hero-curve hero-edge relative z-[1] w-full overflow-hidden bg-noir-900">
         <video
           autoPlay
           muted
@@ -45,9 +45,9 @@ export default async function HomePage() {
           preload="metadata"
           aria-hidden
           src="/videos/hero.mp4"
-          className="hero-edge-media absolute inset-x-0 bottom-0 w-full object-cover object-center"
+          className="hero-edge-media absolute inset-0"
         />
-        <div className="hero-scrim hero-edge-media absolute inset-x-0 bottom-0" aria-hidden />
+        <div className="hero-scrim hero-edge-media absolute inset-0" aria-hidden />
 
         <div className="absolute inset-x-0 bottom-0 z-[3] px-5 pb-6">
           <p className="mb-2 w-full animate-fade-up whitespace-nowrap text-center text-sm uppercase tracking-[0.85em] text-gold-light">

@@ -17,12 +17,13 @@
 
   html {
     scroll-behavior: smooth;
+    background-color: #110c0d;
   }
 
   body {
     @apply bg-blush text-noir-900 font-sans antialiased;
     text-rendering: optimizeLegibility;
-    overflow-x: hidden;
+    overflow-x: clip;
     min-height: 100dvh;
   }
 
@@ -127,15 +128,23 @@
     border-bottom-right-radius: 50% 1.75rem;
   }
 
-  /* PWA / notch: מושך את ההירו מתחת ל-status bar, התמונה ממלאת עד הקצה */
+  /* PWA / notch: ההירו נמתח מתחת ל-status bar והמדיה ממלאת את כל השטח */
   .hero-edge {
-    margin-top: calc(-1 * env(safe-area-inset-top, 0px));
-    padding-top: env(safe-area-inset-top, 0px);
+    --hero-sat: 0px;
+    --hero-sat: constant(safe-area-inset-top);
+    --hero-sat: env(safe-area-inset-top, 0px);
+    height: calc(72dvh + var(--hero-sat));
+    min-height: calc(480px + var(--hero-sat));
+    margin-top: calc(-1 * var(--hero-sat));
+    padding-top: 0;
   }
 
   .hero-edge-media {
-    top: calc(-1 * env(safe-area-inset-top, 0px));
-    height: calc(100% + env(safe-area-inset-top, 0px));
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
   }
 
   .hero-scrim {
