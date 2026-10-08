@@ -128,9 +128,9 @@
   }
 
   .hero-edge {
-    height: calc(72dvh + var(--hero-sat, 0px));
-    min-height: calc(480px + var(--hero-sat, 0px));
-    margin-top: calc(-1 * var(--hero-sat, 0px));
+    height: 72dvh;
+    min-height: 480px;
+    margin-top: 0;
     padding-top: 0;
   }
 
@@ -345,10 +345,7 @@
   @apply border-neutral-600 bg-noir-800 text-cream;
 }
 
-/* מחוץ ל-@layer כדי לנצח cache — אחרת overflow על body חותך את ההירו מתחת ל-status bar */
-html {
-  background-color: #110c0d !important;
-}
+/* אל תגזירו overflow על html/body — זה חותך מדיה full-bleed. אל תצבעו status bar אטום. */
 html,
 body {
   overflow-x: visible !important;
@@ -357,19 +354,14 @@ body {
 :root {
   --hero-sat: 0px;
 }
+html.is-pwa {
+  --hero-sat: 0px;
+  color-scheme: light;
+}
 @media (display-mode: standalone), (display-mode: fullscreen) {
   :root {
-    --hero-sat: max(59px, env(safe-area-inset-top, 0px));
-    color-scheme: dark;
+    --hero-sat: 0px;
+    color-scheme: light;
   }
-  html,
-  body {
-    background-color: #110c0d !important;
-  }
-}
-html.is-pwa {
-  --hero-sat: max(59px, env(safe-area-inset-top, 0px));
-  color-scheme: dark;
-  background-color: #110c0d !important;
 }
 

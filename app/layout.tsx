@@ -32,7 +32,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#110C0D",
+  // Solid theme-color makes iOS paint an opaque status bar over the hero.
+  themeColor: [{ media: "(display-mode: browser)", color: "#110C0D" }],
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -53,7 +54,6 @@ export default async function RootLayout({
         <Script id="pwa-safe-area" strategy="beforeInteractive">
           {`(function(){
   var r=document.documentElement;
-  r.style.backgroundColor="#110C0D";
   if(!document.querySelector('meta[name="apple-mobile-web-app-capable"]')){
     var m=document.createElement("meta");
     m.name="apple-mobile-web-app-capable";
@@ -63,8 +63,9 @@ export default async function RootLayout({
   var pwa=window.navigator.standalone===true||(window.matchMedia&&(matchMedia("(display-mode: standalone)").matches||matchMedia("(display-mode: fullscreen)").matches));
   if(pwa){
     r.classList.add("is-pwa");
-    r.style.setProperty("--hero-sat","59px");
-    r.style.colorScheme="dark";
+    r.style.removeProperty("--hero-sat");
+    r.style.colorScheme="light";
+    document.querySelectorAll('meta[name="theme-color"]').forEach(function(el){el.remove();});
   }
 })();`}
         </Script>
