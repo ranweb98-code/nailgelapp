@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { PwaSafeArea } from "@/components/PwaSafeArea";
 
 const ServiceWorkerRegister = dynamic(
   () =>
@@ -29,6 +30,7 @@ const NotificationPermissionGate = dynamic(
 export function ClientShell() {
   return (
     <>
+      <PwaSafeArea />
       <ServiceWorkerRegister />
       <HomeScreenInstallGate />
       <NotificationPermissionGate />

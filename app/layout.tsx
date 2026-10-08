@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Heebo } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { ClientShell } from "@/components/ClientShell";
 import { getSettings } from "@/lib/settings";
@@ -26,6 +27,7 @@ export const metadata: Metadata = {
   },
   other: {
     "mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-capable": "yes",
   },
 };
 
@@ -46,13 +48,26 @@ export default async function RootLayout({
   const theme = settings.bgTheme;
 
   return (
-    <html
-      lang="he"
-      dir="rtl"
-      data-theme={theme}
-      className={sans.variable}
-    >
+    <html lang="he" dir="rtl" data-theme={theme} className={sans.variable}>
       <body>
+        <Script id="pwa-safe-area" strategy="beforeInteractive">
+          {`(function(){
+  var r=document.documentElement;
+  r.style.backgroundColor="#110C0D";
+  if(!document.querySelector('meta[name="apple-mobile-web-app-capable"]')){
+    var m=document.createElement("meta");
+    m.name="apple-mobile-web-app-capable";
+    m.content="yes";
+    document.head.appendChild(m);
+  }
+  var pwa=window.navigator.standalone===true||(window.matchMedia&&(matchMedia("(display-mode: standalone)").matches||matchMedia("(display-mode: fullscreen)").matches));
+  if(pwa){
+    r.classList.add("is-pwa");
+    r.style.setProperty("--hero-sat","59px");
+    r.style.colorScheme="dark";
+  }
+})();`}
+        </Script>
         {children}
         <ClientShell />
       </body>
